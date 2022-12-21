@@ -4,4 +4,5 @@ The full code with detailed documentation will be publicly available when the fi
 
 Project managed by Zixian Wang (Purmortal) from the University of Sydney, a PhD student supervised by Joss Bland-Hawthorn, Michael Hayden and Sanjib Sharma.
 Collaborators including Jesse van de sande and Sam Vaughan
+
 Contact: zwan0382@uni.sydney.edu.au / wang.zixian.astro@gmail.com

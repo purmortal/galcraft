@@ -55,4 +55,4 @@ This software is governed by the MIT License. In brief, you can use, distribute,
 
 
 ## Contact 
-zwan0382@uni.sydney.edu.au / wang.zixian.astro@gmail.com
+wang.zixian.astro@gmail.com

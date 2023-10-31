@@ -52,3 +52,7 @@ If you use this software framework for any publication, please cite the original
 
 ## License
 This software is governed by the MIT License. In brief, you can use, distribute, and change this package as you want.
+
+
+## Contact 
+zwan0382@uni.sydney.edu.au / wang.zixian.astro@gmail.com

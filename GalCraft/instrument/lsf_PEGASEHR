@@ -1,0 +1,7 @@
+# Column 1: Wavelength vector in Angstrom
+# Column 2: FWHM of observation at the respective wavelength in Angstrom
+#
+# This files describes the udf-10 line-spread-function of PEGASE-HR SSP models,
+#
+3000.0000     0.5500
+10000.0000    0.5500

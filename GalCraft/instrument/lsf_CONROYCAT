@@ -1,0 +1,8 @@
+# Column 1: Wavelength vector in Angstrom
+# Column 2: FWHM of observation at the respective wavelength in Angstrom
+#
+# This files describes the udf-10 line-spread-function of Conroy SSP models including CaT regions,
+#
+3000.0000     2.5100
+7530.0000     2.5100
+10002.0000     3.3340

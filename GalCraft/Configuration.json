@@ -1,0 +1,57 @@
+{
+  "oparams": {
+    "distance": 26500,
+    "theta_zx": -4.0,
+    "theta_yz": 0.0,
+    "l": 0.0,
+    "b": 0.0
+  },
+  "ssp_params": {
+    "model": "conroyinmilesCaT_moremetalalpha",
+    "isochrone": "null",
+    "imf": "null",
+    "slope": "null",
+    "single_alpha": false,
+    "factor": 10,
+    "FWHM_gal": "lsf_CONROYCAT",
+    "FWHM_tem": "lsf_CONROYCAT",
+    "dlam": null,
+    "age_range": null,
+    "metal_range": null,
+    "wave_range": null,
+    "spec_interpolator": "linear"
+  },
+  "cube_params": {
+    "x_coord": "l",
+    "y_coord": "b",
+    "instrument": "MUSE-WFM",
+    "spatial_resolution": [
+      0.2,
+      0.2
+    ],
+    "spatial_nbin": [
+      315,
+      315
+    ],
+    "spatial_percentile": true,
+    "bootstrap_table": false,
+    "use_dist": true,
+    "use_losvd": true,
+    "use_extinc": false,
+    "extinc_factor": 1,
+    "invert_b": false,
+    "sn": 100,
+    "add_noise": false
+  },
+  "other_params": {
+    "mode": "normal",
+    "nparticles": null,
+    "gal_mass": 50000000000.0,
+    "log_mode": "w",
+    "ncpu": 15,
+    "nprocess_ploop": 100,
+    "plot_statistics": true,
+    "model_name": "mwmodel1_1e8_noyoungest.ebf",
+    "write_table": true
+  }
+}

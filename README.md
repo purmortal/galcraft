@@ -8,11 +8,11 @@ The produced mock data cubes can be analyzed in the same way as real IFS observa
 
 An elaborate, Python-native parallelization is implemented and tested on various machines from laptops to cluster scales. 
 
-***The source code of GalCraft will be publicly available when the [original paper](https://ui.adsabs.harvard.edu/abs/2023arXiv231018258W/abstract) gets accepted. But the current version of codes can be shared with reasonable requests***
+[//]: # (***The source code of GalCraft will be publicly available when the [original paper]&#40;https://ui.adsabs.harvard.edu/abs/2023arXiv231018258W/abstract&#41; gets accepted. But the current version of codes can be shared with reasonable requests***)
 
 
 
-[//]: # (## Installation)
+## Installation
 
 [//]: # ()
 [//]: # (### Using pip)
@@ -26,15 +26,11 @@ An elaborate, Python-native parallelization is implemented and tested on various
 [//]: # ()
 [//]: # (### From the git repo)
 
-[//]: # (```)
-
-[//]: # (git clone https://github.com/purmortal/galcraft.git)
-
-[//]: # (cd pymcfost)
-
-[//]: # (pip install .)
-
-[//]: # (```)
+```
+git clone https://github.com/purmortal/galcraft.git
+cd galcraft
+python setup.py install
+```
 
 
 

@@ -51,4 +51,6 @@ This software is governed by the MIT License. In brief, you can use, distribute,
 
 
 ## Contact 
-wang.zixian.astro@gmail.com
+- Zixian Wang (University of Utah, wang.zixian.astro@gmail.com)
+- Michael Hayden (University of Oklahoma, mrhayden@ou.edu)
+- Sanjib Sharma (Space Telescope Science Institute, ssharma@stsci.edu)

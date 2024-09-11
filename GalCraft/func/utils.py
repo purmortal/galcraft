@@ -1,8 +1,10 @@
 import numpy as np
 from multiprocessing import Pool
+import ppxf.ppxf_util as ppxf_util
 from time import perf_counter as clock
 
 from scipy.stats import binned_statistic_2d
+from scipy.stats import pearsonr
 
 import matplotlib.colors as colors
 from matplotlib import pyplot as plt
@@ -111,6 +113,83 @@ def plot_binned_grids_color(x, y, values, statistic, x_edges, y_edges, xlabel, y
     return im, ax, binned_statistic, x_edges, y_edges
 
 
+
+
+
+def plot_parameter_maps(mass_fraction_pixel_bin, age_grid_2d, metal_grid_2d, alpha_grid, reg_dim,
+                        x_edges, y_edges, xlabel, ylabel, cmap, **kwargs):
+    '''
+
+    :param mass_fraction_pixel_bin:
+    :param age_grid_2d:
+    :param metal_grid_2d:
+    :param reg_dim:
+    :param x_edges:
+    :param y_edges:
+    :param xlabel:
+    :param ylabel:
+    :param cmap:
+    :param kwargs:
+    :return:
+    '''
+
+    x_edges = np.flip(x_edges)
+
+    mass_weighted_age = np.zeros(mass_fraction_pixel_bin.shape[3:])
+    mass_weighted_metal = np.zeros(mass_fraction_pixel_bin.shape[3:])
+    mass_weighted_alpha = np.zeros(mass_fraction_pixel_bin.shape[3:])
+
+    for i in range(mass_fraction_pixel_bin.shape[-2]):
+        for j in range(mass_fraction_pixel_bin.shape[-1]):
+            mass_fraction_pixel = mass_fraction_pixel_bin[:, :, :, i, j]
+            if np.sum(mass_fraction_pixel) == 0:
+                mass_weighted_age[i, j] = np.nan
+                mass_weighted_metal[i, j] = np.nan
+                mass_weighted_alpha[i, j] = np.nan
+            else:
+                age, metal, alpha = mean_age_metal_alpha(age_grid_2d, metal_grid_2d, alpha_grid, mass_fraction_pixel, reg_dim, True)
+                mass_weighted_age[i, j] = age
+                mass_weighted_metal[i, j] = metal
+                mass_weighted_alpha[i, j] = alpha
+
+    plt.figure(figsize=[18, 4])
+
+    plt.subplot(131)
+    ax1 = plt.gca()
+    vmin = np.nanpercentile(mass_weighted_age, 0.5)
+    vmax = np.nanpercentile(mass_weighted_age, 99.5)
+    im1 = ax1.pcolormesh(x_edges, y_edges, mass_weighted_age, cmap=cmap, vmin=vmin, vmax=vmax, **kwargs)
+    cbar1 = plt.colorbar(im1, ax=ax1)
+    cbar1.set_label('log(Age)')
+    ax1.set_ylabel(ylabel)
+    ax1.set_xlabel(xlabel)
+
+    plt.subplot(132)
+    ax2 = plt.gca()
+    vmin = np.nanpercentile(mass_weighted_metal, 0.5)
+    vmax = np.nanpercentile(mass_weighted_metal, 99.5)
+    im2 = ax2.pcolormesh(x_edges, y_edges, mass_weighted_metal, cmap=cmap, vmin=vmin, vmax=vmax, **kwargs)
+    cbar2 = plt.colorbar(im2, ax=ax2)
+    cbar2.set_label('[M/H]')
+    ax2.set_ylabel(ylabel)
+    ax2.set_xlabel(xlabel)
+
+    plt.subplot(133)
+    ax3 = plt.gca()
+    vmin = np.nanpercentile(mass_weighted_alpha, 0.5)
+    vmax = np.nanpercentile(mass_weighted_alpha, 99.5)
+    im3 = ax3.pcolormesh(x_edges, y_edges, mass_weighted_alpha, cmap=cmap, vmin=vmin, vmax=vmax, **kwargs)
+    cbar3 = plt.colorbar(im3, ax=ax3)
+    cbar3.set_label('[Alpha/Fe]')
+    ax3.set_ylabel(ylabel)
+    ax3.set_xlabel(xlabel)
+
+    ax1.invert_xaxis()
+    ax2.invert_xaxis()
+    ax3.invert_xaxis()
+
+    plt.tight_layout()
+
 ##################################################################################
 
 
@@ -209,6 +288,42 @@ def degrade_spec_cube(cube_flux, cube_err, FWHM_gal, FWHM_tem, ncpu, dlam, gau_n
     print('Elapsed time in generating spectra: %.2f s' % (clock() - t))
 
     return cube_flux_degraded, cube_err_degraded
+
+
+##################################################################################
+
+
+
+
+##################################################################################
+# Functions from other sources
+
+def mean_age_metal_alpha(age_grid_2d, metal_grid_2d, alpha_grid, weights, reg_dim, quiet=False):
+    '''
+    This is modified from PPXF, compatible with single alpha case
+    :param age_grid_2d:
+    :param metal_grid_2d:
+    :param alpha_grid:
+    :param weights:
+    :param reg_dim:
+    :param quiet:
+    :return:
+    '''
+
+    log_age_grids = np.log10(age_grid_2d) + 9
+    metal_grids = metal_grid_2d
+
+    weights_sum = np.sum(weights, axis=2)
+    mean_log_age = np.sum(weights_sum * log_age_grids) / np.sum(weights_sum)
+    mean_metal = np.sum(weights_sum * metal_grids) / np.sum(weights_sum)
+    mean_alpha = np.sum(np.sum(weights * alpha_grid, axis=2)) / np.sum(weights_sum)
+
+    if not quiet:
+        print('Weighted <logAge> [yr]: %#.3g' % mean_log_age)
+        print('Weighted <[M/H]>: %#.3g' % mean_metal)
+        print('Weighted <[Alpha/Fe]>: %#.3g' % mean_alpha)
+
+    return mean_log_age, mean_metal, mean_alpha
 
 
 ##################################################################################

@@ -58,7 +58,7 @@ def process_DegradingLogRebinning_templates(starNew, wave, wave_oversampled, sig
 
 class model:
 
-    def __init__(self, templateDir, ssp_params, other_params, logger):
+    def __init__(self, templateDir, instrumentDir, ssp_params, other_params, logger):
 
         self.logger = logger
 
@@ -78,6 +78,7 @@ class model:
         self.wave_range = ssp_params['wave_range']
         self.interpolator_method = ssp_params['spec_interpolator']
         self.ncpu = other_params['ncpu']
+
 
         models = []
 
@@ -237,14 +238,14 @@ class model:
         # Setup FWHM_gal, FWHM_tem file and calculate sig
         if type(self.FWHM_gal) == str:
             self.logger.info('Load the line-spread function %s from the folder ./instrument' % self.FWHM_gal)
-            lsf_gal = np.genfromtxt(code_dir + 'instrument/' + self.FWHM_gal)
+            lsf_gal = np.genfromtxt(instrumentDir + self.FWHM_gal)
         else:
             lsf_gal = np.zeros([len(wave), 2])
             lsf_gal[:, 0] = wave
             lsf_gal[:, 1] = self.FWHM_gal
         if type(self.FWHM_tem) == str:
             self.logger.info('Load the line-spread function %s from the folder ./instrument' % self.FWHM_tem)
-            lsf_tem = np.genfromtxt(code_dir + 'instrument/' + self.FWHM_tem)
+            lsf_tem = np.genfromtxt(instrumentDir + self.FWHM_tem)
         else:
             lsf_tem = np.zeros([len(wave), 2])
             lsf_tem[:, 0] = wave

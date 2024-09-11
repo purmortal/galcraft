@@ -32,8 +32,8 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
     if cube_params['instrument'].upper() != "DEFAULT":
-        logger.info('Load the cube list from %s' % (output_path + 'setup_file/' + input_arg + '_list'))
-        cube_centers = np.genfromtxt(output_path + 'setup_file/' + input_arg + '_list', dtype=float, delimiter=',')
+        logger.info('Load the cube list from %s' % (input_arg + '_list'))
+        cube_centers = np.genfromtxt(input_arg + '_list', dtype=float, delimiter=',')
         if len(cube_centers.shape) == 1:
             cube_centers = np.array([cube_centers])
         logger.info('Load the list of center positions of data cubes.')
@@ -270,7 +270,7 @@ def spatial_binner_continue(cube_params, other_params, filepath, logger, input_a
     assert cube_params['instrument'].upper() != "DEFAULT", "There has to be an instrument assigned for running the 'continue' mode."
 
     logger.info('Load the cube list from %s' % (filepath + 'cube_list'))
-    cube_centers = np.genfromtxt(output_path + 'setup_file/' + input_arg + '_list', dtype=float, delimiter=',')
+    cube_centers = np.genfromtxt(input_arg + '_list', dtype=float, delimiter=',')
     # cube_centers = np.genfromtxt(filepath + 'cube_list', dtype=float, delimiter='/')
     if len(cube_centers.shape) == 1:
         cube_centers = np.array([cube_centers])

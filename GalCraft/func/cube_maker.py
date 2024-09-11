@@ -1,9 +1,8 @@
-from .constant import *
 import numpy as np
 from astropy.io import fits
 
 
-def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, cube_idx, velscale):
+def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, cube_idx, velscale, version):
 
     wave_range = params['ssp_params']['wave_range']
     # Do the wavelength cut

@@ -12,13 +12,14 @@ import json
 import optparse
 from time import perf_counter as clock
 
-from func.constant import *
-import func.ssp_loader as ssp_loader
-import func.binner as binner
-import func.spec_generator as spec_generator
-import func.cube_maker as cube_maker
-import func.cot as cot
-from func.log import Logger
+from GalCraft.func.constant import *
+import GalCraft.func.ssp_loader as ssp_loader
+import GalCraft.func.binner as binner
+import GalCraft.func.spec_generator as spec_generator
+import GalCraft.func.cube_maker as cube_maker
+import GalCraft.func.cot as cot
+from GalCraft.func.log import Logger
+from GalCraft._version import __version__
 
 
 def run_GalCraft(CommandOption):
@@ -32,7 +33,7 @@ def run_GalCraft(CommandOption):
     # - - - - - INITIALIZATION - - - - -
 
     # Initialize cube name and paths
-    cube_name = CommandOption.config
+    cube_name = CommandOption.configName
     setup_cube_name = 'setup_' + cube_name
     if os.path.isfile(CommandOption.defaultDir) == True:
         for line in open(CommandOption.defaultDir, "r"):
@@ -52,6 +53,9 @@ def run_GalCraft(CommandOption):
                     print("WARNING! "+line[1]+" specified as default "+line[0]+" is not a directory!")
     else:
         print("WARNING! "+CommandOption.defaultDir+" is not a file!")
+    # Obtain ./instrument/ dir
+    this_dir, this_filename = os.path.split(__file__)
+    instrumentDir = os.path.join(this_dir, "instrument") + '/'
     # Imports the setup file
     with open(configDir + setup_cube_name + '.json', 'r') as f:
         params = json.load(f)
@@ -81,7 +85,7 @@ def run_GalCraft(CommandOption):
     # this means you are going to setup your own instrument
     # If "instrument"=="DEFAULT", it will generate a huge cube using all the particles
     if inst != 'DIY' and inst!='DEFAULT':
-        with open('./instrument/' + inst + '.json', 'r') as f:
+        with open(instrumentDir + inst + '.json', 'r') as f:
             inst_params = json.load(f)
         for key in inst_params:
             params['cube_params'][key] = inst_params[key]
@@ -92,7 +96,7 @@ def run_GalCraft(CommandOption):
 
     logger.info('Loading SSP models...')
     t = clock()
-    ssp_model = ssp_loader.model(templateDir, params['ssp_params'], params['other_params'], logger)
+    ssp_model = ssp_loader.model(templateDir, instrumentDir, params['ssp_params'], params['other_params'], logger)
     ssp_model.oversample()
     logger.info('SSP model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
 
@@ -151,14 +155,14 @@ def run_GalCraft(CommandOption):
         t = clock()
         d_t_l, statistic_count_l, x_edges_l, y_edges_l = binner.spatial_binner(d_t, params['cube_params'], params['other_params'],
                                                                                ssp_model.age_grid, ssp_model.metal_grid, ssp_model.alpha_grid,
-                                                                               filepath, logger, setup_cube_name,
+                                                                               filepath, logger, configDir + setup_cube_name,
                                                                                params['oparams']['distance'], nparticles)
         logger.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
     else:
         logger.info('Continue the running from previous run...')
         t = clock()
         d_t_l, statistic_count_l, x_edges_l, y_edges_l = binner.spatial_binner_continue(params['cube_params'], params['other_params'],
-                                                                                        filepath, logger, setup_cube_name)
+                                                                                        filepath, logger, configDir + setup_cube_name)
         logger.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
     d_t = None
 
@@ -196,7 +200,7 @@ def run_GalCraft(CommandOption):
 
     # - - - - - WRITE DATACUBE  - - - - -
 
-        cube_maker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, logger, cube_idx, ssp_model.velscale)
+        cube_maker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, logger, cube_idx, ssp_model.velscale, __version__)
         logger.info('Data Cube No.%s has been written in %s, total time elapsed: %.2f s' % (cube_idx+1, filepath , clock() - t))
 
 
@@ -232,7 +236,7 @@ def main(args=None):
     (CommandOption, args) = parser.parse_args()
 
     # Check if required command-line argument is given
-    assert CommandOption.config != None, "Please specify the path of the Configuration.json file to be used. Exit!"
+    assert CommandOption.configName != None, "Please specify the path of the Configuration.json file to be used. Exit!"
 
     # Run the framework
     run_GalCraft(CommandOption)

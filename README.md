@@ -1,5 +1,5 @@
 
-# GalCraft: Building integral-field spectrograph data cubes of the Galaxy
+# GalCraft: Building integral-field spectrograph data cubes of the Milky Way
 
 
 GalCraft is a flexible software to create mock IFS observations of the Milky Way and other hydrodynamical/N-body simulations. It is entirely written in Python3 and conducts all the procedures from inputting data and spectral templates to the output of IFS data cubes in `fits` format. 

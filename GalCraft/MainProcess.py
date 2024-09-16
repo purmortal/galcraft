@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import sys
 os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -12,7 +11,6 @@ import json
 import optparse
 from time import perf_counter as clock
 
-from GalCraft.func.constant import *
 import GalCraft.func.ssp_loader as ssp_loader
 import GalCraft.func.binner as binner
 import GalCraft.func.spec_generator as spec_generator

@@ -2,58 +2,16 @@ from . import conroyinmiles_util as conroyinmiles_lib
 from . import pegase_interp_util as pegase_interp_lib
 from . import pegase_util as pegase_lib
 from . import miles_util as miles_lib
-from .constant import *
 from . import utils
-from ppxf.ppxf_util import log_rebin
-from spectres import spectres
 import numpy as np
 from scipy import ndimage
 from multiprocessing import Pool
 
 
 
-
-# def setup_interpolator(single_alpha, interpolator_method, templatesTransposed, logage_grid, metal_grid, alpha_grid=None):
-#
-#     if single_alpha:
-#
-#         assert interpolator_method != "interp_on_alpha", "'interp_on_alpha' is not avaliable for single alpha case."
-#         SSP_grids = (logage_grid, metal_grid)
-#         interpolator = RegularGridInterpolator(SSP_grids, templatesTransposed[:, :, 0, :], method=interpolator_method)
-#         interpolator = interpolator
-#
-#     else:
-#
-#         if interpolator_method == "nearest" or interpolator_method == "linear":
-#             SSP_grids = (logage_grid, metal_grid, alpha_grid)
-#             interpolator = RegularGridInterpolator(SSP_grids, templatesTransposed, method=interpolator_method)
-#             interpolator = interpolator
-#
-#         elif interpolator_method == "interp_on_alpha":
-#             SSP_grids = (logage_grid, metal_grid)
-#             interpolator_alpha00 = RegularGridInterpolator(SSP_grids, templatesTransposed[:, :, 0, :], method="nearest")
-#             interpolator_alpha04 = RegularGridInterpolator(SSP_grids, templatesTransposed[:, :, 1, :], method="nearest")
-#             interpolator = [interpolator_alpha00, interpolator_alpha04]
-#
-#         else:
-#             raise ValueError(
-#                 "Initializing the interpolator ailed, the method has to be either 'nearest', 'linear', or 'interp_on_alpha'.")
-#
-#     return interpolator
-
-
-
 def process_Oversampling_templates(star, factor, i, j, k):
     starNew = ndimage.interpolation.zoom(star, factor, order=3)  # Oversampling
     return starNew, i, j, k
-
-
-def process_DegradingLogRebinning_templates(starNew, wave, wave_oversampled, sig, velscale, idx_lam, lamRange_spmod, i, j, k):
-    starNew = utils.degrade_spec_ppxf(starNew, None, sig, gau_npix=None)[0]  # Degrading the oversampled spectra
-    star = spectres(wave, wave_oversampled, starNew, fill=np.nan, verbose=False)  # The rebin is needed because the spectra is also rebinned
-    star = star[idx_lam]
-    starLogRebin, logLam, _ = log_rebin(lamRange_spmod, star, velscale=velscale)
-    return starLogRebin, logLam, i, j, k
 
 
 class model:
@@ -338,79 +296,3 @@ class model:
         self.sig_oversampled = sig_oversampled
 
         self.templatesTransposed = np.transpose(self.templatesOversampled, (1, 2, 3, 0))
-
-
-
-    def degrade_logrebin(self, velscale, lmin, lmax):
-
-        lamRange_spmod = self.wave[[0, -1]]
-
-        # Determine length of templates
-        template_overhead = np.zeros(2)
-        if lmin - lamRange_spmod[0] > 150.:
-            template_overhead[0] = 150.
-        else:
-            template_overhead[0] = lmin - lamRange_spmod[0] - 5
-        if lamRange_spmod[1] - lmax > 150.:
-            template_overhead[1] = 150.
-        else:
-            template_overhead[1] = lamRange_spmod[1] - lmax - 5
-
-        # Create new lamRange according to the provided LMIN and LMAX values, according to the module which calls
-        constr = np.array([ lmin - template_overhead[0], lmax + template_overhead[1] ])
-        idx_lam = np.where( np.logical_and(self.wave > constr[0], self.wave < constr[1] ) )[0]
-        lamRange_spmod = np.array([ self.wave[idx_lam[0]], self.wave[idx_lam[-1]] ])
-
-        star_eg= process_DegradingLogRebinning_templates(self.templatesOversampled[:, 0, 0, 0], self.wave, self.wave_oversampled, self.sig_oversampled, velscale, idx_lam, lamRange_spmod, 0, 0, 0)[0]
-        templatesOversampledDegradedLogRebinned = np.zeros([star_eg.shape[0]] + list(self.templates.shape[1:]))
-
-        pool = Pool(processes=self.ncpu)
-        results = []
-        for i in range(templatesOversampledDegradedLogRebinned.shape[1]):
-            for j in range(templatesOversampledDegradedLogRebinned.shape[2]):
-                for k in range(templatesOversampledDegradedLogRebinned.shape[3]):
-                    results.append(pool.apply_async(process_DegradingLogRebinning_templates,
-                                                    (self.templatesOversampled[:, i, j, k], self.wave, self.wave_oversampled, self.sig_oversampled, velscale, idx_lam, lamRange_spmod, i, j, k, )))
-        pool.close()
-        pool.join()
-
-        for result in results:
-            star, logLam, i, j, k = result.get()
-            templatesOversampledDegradedLogRebinned[:, i, j, k] = star
-
-        self.templatesOversampledDegradedLogRebinned = templatesOversampledDegradedLogRebinned / np.mean(templatesOversampledDegradedLogRebinned)
-        self.logLam = logLam
-
-
-
-
-    # def setup_interpolator(self):
-    #     self.logger.info('Setup the interpolator for later usage, interpolator method is "%s".' % self.interpolator_method)
-    #     # Set up the spectra interpolator
-    #     self.templatesTransposed = np.transpose(self.templatesOversampled, (1, 2, 3, 0))
-    #
-    #     if self.single_alpha:
-    #
-    #         assert self.interpolator_method != "interp_on_alpha", "'interp_on_alpha' is not avaliable for single alpha case."
-    #
-    #         SSP_grids = (self.logage_grid, self.metal_grid)
-    #         interpolator = RegularGridInterpolator(SSP_grids, self.templatesTransposed[:, :, 0, :], method=self.interpolator_method)
-    #         self.interpolator = interpolator
-    #
-    #     else:
-    #
-    #         if self.interpolator_method == "nearest" or self.interpolator_method == "linear":
-    #             SSP_grids = (self.logage_grid, self.metal_grid, self.alpha_grid)
-    #             interpolator = RegularGridInterpolator(SSP_grids, self.templatesTransposed, method=self.interpolator_method)
-    #             self.interpolator = interpolator
-    #
-    #         elif self.interpolator_method == "interp_on_alpha":
-    #             self.logger.info('For "%s", two interpolator has been setup.' % self.interpolator_method)
-    #             SSP_grids = (self.logage_grid, self.metal_grid)
-    #             interpolator_alpha00 = RegularGridInterpolator(SSP_grids, self.templatesTransposed[:, :, 0, :], method="nearest")
-    #             interpolator_alpha04 = RegularGridInterpolator(SSP_grids, self.templatesTransposed[:, :, 1, :], method="nearest")
-    #             self.interpolator = [interpolator_alpha00, interpolator_alpha04]
-    #
-    #         else:
-    #             raise ValueError(
-    #                 "Initializing the interpolator ailed, the method has to be either 'nearest', 'linear', or 'interp_on_alpha'.")

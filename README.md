@@ -14,22 +14,18 @@ An elaborate, Python-native parallelization is implemented and tested on various
 
 ## Installation
 
-[//]: # ()
-[//]: # (### Using pip)
+### Using pip
 
-[//]: # (```)
+```
+pip install GalCraft
+```
 
-[//]: # (pip install pymcfost)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (### From the git repo)
+### From the git repo
 
 ```
 git clone https://github.com/purmortal/galcraft.git
 cd galcraft
-python setup.py install
+pip install .
 ```
 
 

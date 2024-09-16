@@ -204,7 +204,7 @@ class SpecGeneratorPix():
             galaxy_rebin = np.zeros(int(self.templatesOversampled_shape[0] / self.factor))
 
 
-        self.logger.info('Generated the spectra for the spatial pixel %s using %s particles, time elapsed: %.2f s' % ([i, j], len(self.d_t_pixel), clock() - t))
+        self.logger.info('Generated a spectrum for spatial pixel %s using %s particles, time elapsed: %.2f s' % ([int(i), int(j)], len(self.d_t_pixel), clock() - t))
         return SpecResult(mass_fraction_pixel=mass_fraction_pixel, galaxy_rebin=galaxy_rebin, i=i, j=j)
 
 

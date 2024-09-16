@@ -1,10 +1,8 @@
 import numpy as np
 from multiprocessing import Pool
-import ppxf.ppxf_util as ppxf_util
 from time import perf_counter as clock
 
 from scipy.stats import binned_statistic_2d
-from scipy.stats import pearsonr
 
 import matplotlib.colors as colors
 from matplotlib import pyplot as plt
@@ -245,7 +243,7 @@ def degrade_spec_ppxf(spec, spec_err=None, sig=0, gau_npix=None):
 
     conv_spectrum = np.einsum('ij,ij->j', a, gau)
 
-    if np.all(spec_err) != None:
+    if np.all(spec_err != None):
         a_e = np.zeros((m, n))
         for j in range(m):
             a_e[j, p:-p] = spec_err[j:n - m + j + 1]

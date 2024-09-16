@@ -1,13 +1,3 @@
-# The functions in this file is for bin the numerical models into different pixels
-# based on the spatial sampling
-
-# Input: the model with N particles, spatial sampling
-
-# Output: the binned mass_weight
-
-# Calculation need: Coordinate transforming
-
-from .constant import *
 from . import utils
 import numpy as np
 from astropy.table import Table
@@ -28,7 +18,6 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
     x_coord = cube_params['x_coord']
     y_coord = cube_params['y_coord']
-    # filename = other_params['filename']
 
 
     if cube_params['instrument'].upper() != "DEFAULT":
@@ -264,14 +253,12 @@ def spatial_binner_continue(cube_params, other_params, filepath, logger, input_a
 
     x_coord = cube_params['x_coord']
     y_coord = cube_params['y_coord']
-    # filename = other_params['filename']
 
 
     assert cube_params['instrument'].upper() != "DEFAULT", "There has to be an instrument assigned for running the 'continue' mode."
 
     logger.info('Load the cube list from %s' % (filepath + 'cube_list'))
     cube_centers = np.genfromtxt(input_arg + '_list', dtype=float, delimiter=',')
-    # cube_centers = np.genfromtxt(filepath + 'cube_list', dtype=float, delimiter='/')
     if len(cube_centers.shape) == 1:
         cube_centers = np.array([cube_centers])
     logger.info('Load the list of center positions of data cubes.')
@@ -333,27 +320,27 @@ def spatial_binner_continue(cube_params, other_params, filepath, logger, input_a
 
 
 
-def binned_mass_fraction(particles, age_bins, metal_bins):
-    '''
-    :param particles:
-    :param age_bins:
-    :param metal_bins:
-    :return:
-    '''
-    statistic_mass_alpha00, x_edge_alpha00, y_edge_alpha00, bin_index_alpha00 = binned_statistic_2d(
-        x=np.log10((particles['cube_age']) * 1e9), y=particles['cube_m_h'],
-        values=particles['mass'] * (1 - particles['fraction']), statistic='sum', bins=[age_bins, metal_bins],
-        expand_binnumbers=True)
-    statistic_mass_alpha04, x_edge_alpha04, y_edge_alpha04, bin_index_alpha04 = binned_statistic_2d(
-        x=np.log10((particles['cube_age']) * 1e9), y=particles['cube_m_h'], values=particles['mass'] * particles['fraction'],
-        statistic='sum', bins=[age_bins, metal_bins], expand_binnumbers=True)
-    mass_sum = np.sum([statistic_mass_alpha00, statistic_mass_alpha04])
-    if mass_sum!=0:
-        statistic_mass_alpha00 /= mass_sum
-        statistic_mass_alpha04 /= mass_sum
-    else:
-        statistic_mass_alpha00 = np.zeros(statistic_mass_alpha00.shape)
-        statistic_mass_alpha04 = np.zeros(statistic_mass_alpha04.shape)
-
-    return {'alpha00': [statistic_mass_alpha00, x_edge_alpha00, y_edge_alpha00, bin_index_alpha00, mass_sum],
-            'alpha04': [statistic_mass_alpha04, x_edge_alpha04, y_edge_alpha04, bin_index_alpha04, mass_sum], }
+# def binned_mass_fraction(particles, age_bins, metal_bins):
+#     '''
+#     :param particles:
+#     :param age_bins:
+#     :param metal_bins:
+#     :return:
+#     '''
+#     statistic_mass_alpha00, x_edge_alpha00, y_edge_alpha00, bin_index_alpha00 = binned_statistic_2d(
+#         x=np.log10((particles['cube_age']) * 1e9), y=particles['cube_m_h'],
+#         values=particles['mass'] * (1 - particles['fraction']), statistic='sum', bins=[age_bins, metal_bins],
+#         expand_binnumbers=True)
+#     statistic_mass_alpha04, x_edge_alpha04, y_edge_alpha04, bin_index_alpha04 = binned_statistic_2d(
+#         x=np.log10((particles['cube_age']) * 1e9), y=particles['cube_m_h'], values=particles['mass'] * particles['fraction'],
+#         statistic='sum', bins=[age_bins, metal_bins], expand_binnumbers=True)
+#     mass_sum = np.sum([statistic_mass_alpha00, statistic_mass_alpha04])
+#     if mass_sum!=0:
+#         statistic_mass_alpha00 /= mass_sum
+#         statistic_mass_alpha04 /= mass_sum
+#     else:
+#         statistic_mass_alpha00 = np.zeros(statistic_mass_alpha00.shape)
+#         statistic_mass_alpha04 = np.zeros(statistic_mass_alpha04.shape)
+#
+#     return {'alpha00': [statistic_mass_alpha00, x_edge_alpha00, y_edge_alpha00, bin_index_alpha00, mass_sum],
+#             'alpha04': [statistic_mass_alpha04, x_edge_alpha04, y_edge_alpha04, bin_index_alpha04, mass_sum], }

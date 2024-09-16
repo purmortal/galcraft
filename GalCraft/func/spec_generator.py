@@ -1,12 +1,3 @@
-# The functions in this file is to generate a integrated spectra given the mass_weight
-# of each bin.
-
-
-# input: mass_weight of each bin, vel, velscale
-
-# output: integrated spectra of each bin, and stack them together if in the same LOS (pxiel)
-
-
 import os
 os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
@@ -24,8 +15,6 @@ from matplotlib import pyplot as plt
 
 
 #######################################################################################################################
-# Version 2, allocate the processes by spatial pixels.
-# To check the other versions, go to the github and see the codes before v3.2.2
 SpecGeneratorPixInit = collections.namedtuple('SpecGeneratorPixInit', ['d_t', 'xb', 'yb', 'zb', 'logage_grid',
                                                                        'metal_grid', 'alpha_grid', 'x_edges', 'y_edges',
                                                                        'use_losvd', 'use_extinc', 'extinc_factor',
@@ -116,9 +105,6 @@ class Spec_Generator():
         self.mass_fraction_pixel_bin = np.zeros(list(self.ssp_model.reg_dim) + [self.x_edges.shape[0] - 1, self.y_edges.shape[0] - 1])
         self.data_cube = np.zeros([self.x_edges.shape[0] - 1, self.y_edges.shape[0] - 1, self.ssp_model.new_wave.shape[0]])
 
-        # self.logger.info(self.mass_fraction_pixel_bin.shape)
-        # self.logger.info(self.data_cube.shape)
-
         self.logger.info('Initializing the common variables to be used in each process...')
         initial_arguments = SpecGeneratorPixInit(d_t=self.d_t,
                                                  xb=self.ssp_model.xb,
@@ -191,7 +177,6 @@ class Spec_Generator():
 
         self.mass_fraction_pixel_bin = np.transpose(self.mass_fraction_pixel_bin, (0, 1, 2, 4, 3))
         np.save(self.filepath + 'mass_fraction_array_' + str(self.cube_idx) + '.npy', self.mass_fraction_pixel_bin)
-        # np.save(self.filepath + 'mass_fraction_array_transpose' + str(self.cube_idx) + '.npy', self.mass_fraction_pixel_bin)
         self.logger.info('Save the mass fraction distribution (MFD) of each spatial bin in the folder.')
 
 
@@ -201,8 +186,6 @@ class Spec_Generator():
                                   xlabel=self.cube_params['x_coord'], ylabel=self.cube_params['y_coord'], cmap=plt.cm.Spectral_r)
         plt.savefig(self.filepath + 'grids_distrib_' + str(self.cube_idx) + '.png', dpi=150)
 
-        # np.save(self.filepath + 'data_cube_raw_' + str(self.cube_idx) + '.npy', self.data_cube)
-        # self.logger.info('Save the data_cube raw flux of each spatial bin in the folder.')
 #######################################################################################################################
 
 

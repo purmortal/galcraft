@@ -1,7 +1,5 @@
 import glob
-
 import numpy as np
-import ppxf.ppxf_util as util
 
 
 def age_metal(filename, age_grid, metal_grid):
@@ -116,46 +114,3 @@ class conroy:
         self.n_metal = n_metal
         self.flux = flux
         self.FWHM_tem = FWHM_tem
-
-
-
-
-
-###############################################################################
-
-    def plot(self, weights, nodots=False, colorbar=True, **kwargs):
-
-        assert weights.ndim == 2, "`weights` must be 2-dim"
-        assert self.age_grid.shape == self.metal_grid.shape == weights.shape, \
-            "Input weight dimensions do not match"
-
-        xgrid = np.log10(self.age_grid) + 9
-        ygrid = self.metal_grid
-        util.plot_weights_2d(xgrid, ygrid, weights,
-                             nodots=nodots, colorbar=colorbar, **kwargs)
-
-
-##############################################################################
-
-    def mean_age_metal(self, weights, quiet=False):
-
-        assert weights.ndim == 2, "`weights` must be 2-dim"
-        assert self.age_grid.shape == self.metal_grid.shape == weights.shape, \
-            "Input weight dimensions do not match"
-
-        log_age_grid = np.log10(self.age_grid) + 9
-        metal_grid = self.metal_grid
-
-        # These are eq.(1) and (2) in McDermid+15
-        # http://adsabs.harvard.edu/abs/2015MNRAS.448.3484M
-        mean_log_age = np.sum(weights*log_age_grid)/np.sum(weights)
-        mean_metal = np.sum(weights*metal_grid)/np.sum(weights)
-
-        if not quiet:
-            print('Weighted <logAge> [yr]: %#.3g' % mean_log_age)
-            print('Weighted <[M/H]>: %#.3g' % mean_metal)
-
-        return mean_log_age, mean_metal
-
-
-##############################################################################

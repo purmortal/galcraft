@@ -12,9 +12,6 @@ from matplotlib import pyplot as plt
 
 
 
-
-
-#######################################################################################################################
 SpecGeneratorPixInit = collections.namedtuple('SpecGeneratorPixInit', ['d_t', 'xb', 'yb', 'zb', 'logage_grid',
                                                                        'metal_grid', 'alpha_grid', 'x_edges', 'y_edges',
                                                                        'use_losvd', 'use_extinc', 'extinc_factor',
@@ -185,11 +182,5 @@ class Spec_Generator():
                                   self.ssp_model.alpha_grid, self.ssp_model.reg_dim, self.x_edges, self.y_edges,
                                   xlabel=self.cube_params['x_coord'], ylabel=self.cube_params['y_coord'], cmap=plt.cm.Spectral_r)
         plt.savefig(self.filepath + 'grids_distrib_' + str(self.cube_idx) + '.png', dpi=150)
-
-#######################################################################################################################
-
-
-
-
 
 

@@ -3,6 +3,20 @@ from astropy.io import fits
 
 
 def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, cube_idx, velscale, version):
+    '''
+    Write the final data cube values into a fits file, with proper header information written.
+    :param data_cube:
+    :param params:
+    :param x_edges:
+    :param y_edges:
+    :param new_wave:
+    :param filepath:
+    :param logger:
+    :param cube_idx:
+    :param velscale:
+    :param version:
+    :return:
+    '''
 
     wave_range = params['ssp_params']['wave_range']
     # Do the wavelength cut

@@ -9,7 +9,23 @@ from matplotlib.patches import Rectangle
 
 def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_grid,
                    filepath, logger, input_arg, galaxy_dist, nparticles):
-
+    '''
+    Preparing the stellar particle catalog, N_particle spatial distribution,
+    x and y axis edges from the loaded particle catalog and data cube configurations.
+    :param d_t: stellar particle catalog
+    :param cube_params: cube configurations
+    :param other_params: other configurations
+    :param age_grid: age grid of SSP templates
+    :param metal_grid: metallicity grid of SSP templates
+    :param alpha_grid: alpha grid of SSP templates
+    :param filepath: output file path of this run
+    :param logger: log file
+    :param input_arg: setup input cube name path
+    :param galaxy_dist: galaxy distance to the observer
+    :param nparticles: number of particles in the catalog
+    :return: list of stellar particle catalog, N_particle spatial distribution,
+    x and y axis edges to be used for each data cube run.
+    '''
 
     spatial_resolution = cube_params['spatial_resolution']
     spatial_resolution_deg = np.array(spatial_resolution) / 3600.
@@ -30,7 +46,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
         nbin_y = cube_params['spatial_nbin'][1]
     else:
         logger.info(
-            'The instrument is %s, will generate a huge cube using all the particles.' % cube_params['instrument'].upper())
+            'The instrument is in %s, will generate a huge cube using all the particles.' % cube_params['instrument'].upper())
         if cube_params['spatial_percentile'] == True:
             x_edges = np.arange(np.percentile(d_t[x_coord], 0.05),
                                 np.percentile(d_t[x_coord], 99.95) + spatial_resolution_x, spatial_resolution_x)
@@ -244,7 +260,9 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
 def spatial_binner_continue(cube_params, other_params, filepath, logger, input_arg):
-
+    '''
+    Same as function spatial_binner but in "continue" mode
+    '''
 
     spatial_resolution = cube_params['spatial_resolution']
     spatial_resolution_deg = np.array(spatial_resolution) / 3600.
@@ -318,29 +336,3 @@ def spatial_binner_continue(cube_params, other_params, filepath, logger, input_a
 
 
 
-
-
-# def binned_mass_fraction(particles, age_bins, metal_bins):
-#     '''
-#     :param particles:
-#     :param age_bins:
-#     :param metal_bins:
-#     :return:
-#     '''
-#     statistic_mass_alpha00, x_edge_alpha00, y_edge_alpha00, bin_index_alpha00 = binned_statistic_2d(
-#         x=np.log10((particles['cube_age']) * 1e9), y=particles['cube_m_h'],
-#         values=particles['mass'] * (1 - particles['fraction']), statistic='sum', bins=[age_bins, metal_bins],
-#         expand_binnumbers=True)
-#     statistic_mass_alpha04, x_edge_alpha04, y_edge_alpha04, bin_index_alpha04 = binned_statistic_2d(
-#         x=np.log10((particles['cube_age']) * 1e9), y=particles['cube_m_h'], values=particles['mass'] * particles['fraction'],
-#         statistic='sum', bins=[age_bins, metal_bins], expand_binnumbers=True)
-#     mass_sum = np.sum([statistic_mass_alpha00, statistic_mass_alpha04])
-#     if mass_sum!=0:
-#         statistic_mass_alpha00 /= mass_sum
-#         statistic_mass_alpha04 /= mass_sum
-#     else:
-#         statistic_mass_alpha00 = np.zeros(statistic_mass_alpha00.shape)
-#         statistic_mass_alpha04 = np.zeros(statistic_mass_alpha04.shape)
-#
-#     return {'alpha00': [statistic_mass_alpha00, x_edge_alpha00, y_edge_alpha00, bin_index_alpha00, mass_sum],
-#             'alpha04': [statistic_mass_alpha04, x_edge_alpha04, y_edge_alpha04, bin_index_alpha04, mass_sum], }

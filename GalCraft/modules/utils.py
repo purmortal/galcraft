@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from multiprocessing import Pool
 from time import perf_counter as clock
@@ -9,9 +10,39 @@ from matplotlib import pyplot as plt
 
 
 ##################################################################################
+# Initialization functions
+def initialize_Dirs(CommandOptions):
+    '''
+    Initialize directory paths
+    :param CommandOptions: Command parameters
+    :return: Paths for each directory
+    '''
+    if os.path.isfile(CommandOptions.defaultDir) == True:
+        for line in open(CommandOptions.defaultDir, "r"):
+            if not line.startswith('#'):
+                line = line.split('=')
+                line = [x.strip() for x in line]
+                if os.path.isdir(line[1]) == True:
+                    if line[0] == 'configDir':
+                        configDir = line[1]
+                    elif line[0] == 'outputDir':
+                        outputDir = line[1]
+                    elif line[0] == 'modelDir':
+                        modelDir = line[1]
+                    elif line[0] == 'templateDir':
+                        templateDir = line[1]
+                else:
+                    print("WARNING! "+line[1]+" specified as default "+line[0]+" is not a directory!")
+    else:
+        print("WARNING! "+CommandOptions.defaultDir+" is not a file!")
+
+    return configDir, modelDir, templateDir, outputDir
+
+
+##################################################################################
 # Doppler shift functions
 
-def doppler_shift_payne(wavelength, flux, dv):
+def doppler_shift(wavelength, flux, dv):
     '''
     This is the function from The Payne
     dv is in km/s
@@ -26,8 +57,6 @@ def doppler_shift_payne(wavelength, flux, dv):
     new_wavelength = wavelength * doppler_factor
     new_flux = np.interp(new_wavelength, wavelength, flux)
     return new_flux
-##################################################################################
-
 
 
 
@@ -55,14 +84,13 @@ def reddening_cal00(lam, ebv):
     fact = 10**(-0.4*ebv*k1.clip(0))  # Calzetti+00 equation (2) with opposite sign
 
     return fact # The model spectrum has to be multiplied by this vector
-##################################################################################
 
 
 
 
 
 ##################################################################################
-# Functions to make plots
+# Plotting functions
 
 def plot_binned_grids_color(x, y, values, statistic, x_edges, y_edges, xlabel, ylabel,
                             plot_cb=True, cmap='hot', cblabel=None, color_Lognorm=False,
@@ -195,9 +223,8 @@ def plot_parameter_maps(mass_fraction_pixel_bin, age_grid_2d, metal_grid_2d, alp
 
 
 ##################################################################################
-# Degrading the datacube
+# Spectral Degrading functions
 
-# Modified PPXF method, make it can calculate flux_err
 
 def cal_degrade_sig(FWHM_gal, FWHM_tem, dlam):
     FWHM_dif = np.sqrt(FWHM_gal ** 2 - FWHM_tem ** 2)
@@ -288,13 +315,11 @@ def degrade_spec_cube(cube_flux, cube_err, FWHM_gal, FWHM_tem, ncpu, dlam, gau_n
     return cube_flux_degraded, cube_err_degraded
 
 
-##################################################################################
-
 
 
 
 ##################################################################################
-# Functions from other sources
+# Other functions
 
 def mean_age_metal_alpha(age_grid_2d, metal_grid_2d, alpha_grid, weights, reg_dim, quiet=False):
     '''
@@ -323,5 +348,3 @@ def mean_age_metal_alpha(age_grid_2d, metal_grid_2d, alpha_grid, weights, reg_di
 
     return mean_log_age, mean_metal, mean_alpha
 
-
-##################################################################################

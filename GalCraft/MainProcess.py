@@ -11,16 +11,19 @@ import json
 import optparse
 from time import perf_counter as clock
 
-import GalCraft.func.ssp_loader as ssp_loader
-import GalCraft.func.binner as binner
-import GalCraft.func.spec_generator as spec_generator
-import GalCraft.func.cube_maker as cube_maker
-import GalCraft.func.cot as cot
-from GalCraft.func.log import Logger
+import GalCraft.modules.ssp_loader as ssp_loader
+import GalCraft.modules.binner as binner
+import GalCraft.modules.spec_generator as spec_generator
+import GalCraft.modules.cube_maker as cube_maker
+import GalCraft.modules.cot as cot
+import GalCraft.modules.utils as utils
+from GalCraft.modules.log import Logger
 from GalCraft._version import __version__
 
 
-def run_GalCraft(CommandOption):
+def run_GalCraft(CommandOptions):
+
+
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # - - - - - - - -   I N I T I A L I Z E   G A L C R A F T - - - - - - - - - - -
@@ -28,45 +31,25 @@ def run_GalCraft(CommandOption):
 
     t_init = clock()
 
-    # - - - - - INITIALIZATION - - - - -
+    # - - - - - - - - - - INITIALIZATION - - - - - - - - - -
 
     # Initialize cube name and paths
-    cube_name = CommandOption.configName
+    cube_name = CommandOptions.configName
     setup_cube_name = 'setup_' + cube_name
-    if os.path.isfile(CommandOption.defaultDir) == True:
-        for line in open(CommandOption.defaultDir, "r"):
-            if not line.startswith('#'):
-                line = line.split('=')
-                line = [x.strip() for x in line]
-                if os.path.isdir(line[1]) == True:
-                    if line[0] == 'configDir':
-                        configDir = line[1]
-                    elif line[0] == 'outputDir':
-                        outputDir = line[1]
-                    elif line[0] == 'modelDir':
-                        modelDir = line[1]
-                    elif line[0] == 'templateDir':
-                        templateDir = line[1]
-                else:
-                    print("WARNING! "+line[1]+" specified as default "+line[0]+" is not a directory!")
-    else:
-        print("WARNING! "+CommandOption.defaultDir+" is not a file!")
-    # Obtain ./instrument/ dir
-    this_dir, this_filename = os.path.split(__file__)
-    instrumentDir = os.path.join(this_dir, "instrument") + '/'
-    # Imports the setup file
+    configDir, modelDir, templateDir, outputDir = utils.initialize_Dirs(CommandOptions)
+    # Load the Configuration file
     with open(configDir + setup_cube_name + '.json', 'r') as f:
         params = json.load(f)
     # Setup the output folder
     filepath = outputDir + cube_name + '/'
     if os.path.exists(filepath)==False: os.mkdir(filepath[:-1])
-    # For continue mode, change the logger mode from 'w' to 'a'
-    if params['other_params']['mode'] == 'continue':
+    # Setup logger
+    if params['other_params']['mode'] == 'continue': # For continue mode, change the logger mode from 'w' to 'a'
         params['other_params']['log_mode'] = 'a'
     logger = Logger(logfile=filepath + 'output.log', mode=params['other_params']['log_mode']).get_log()
     logger.info('Loaded the setup file (path %s)' % (configDir + setup_cube_name + '.json'))
     logger.info('Outputs DIR: %s' % filepath)
-    # Setup number of cpu cores to use
+    # Setup cpu cores to use
     if params['other_params']['ncpu'] == None:
         n_cores = len(os.sched_getaffinity(0))
         logger.info('Change the CPU cores from %s to %s due to the CPU availability.' % (params['other_params']['ncpu'], n_cores) )
@@ -75,22 +58,31 @@ def run_GalCraft(CommandOption):
         logger.info('Run the framework using %s CPU cores.' % params['other_params']['ncpu'])
 
 
-    # - - - - - INSTRUMENT SETUP - - - - -
 
-    inst = params['cube_params']['instrument'].upper()
-    # Here is to change the params "spatial_resolution" and "spatial_bin" to the assigned instrument
-    # If "instrument"=="DIY", it will use the "spatial_resolution" and "spatial_bin" in the file. Basically
-    # this means you are going to setup your own instrument
-    # If "instrument"=="DEFAULT", it will generate a huge cube using all the particles
-    if inst != 'DIY' and inst!='DEFAULT':
+    # - - - - - - - - - - INSTRUMENT SETUP - - - - - - - - - -
+
+    # Obtain ./instrument/ dir
+    this_dir, this_filename = os.path.split(__file__)
+    instrumentDir = os.path.join(this_dir, "instrument") + '/'
+    # Load instrument information
+    # If "instrument"=="MUSE-WFM", it will load "MUSE-WFM.json" and use the "spatial_resolution" and "spatial_bin";
+    # If "instrument"=="DIY", you will design your own instrument using "spatial_resolution" and "spatial_bin" in the configuration file;
+    # If "instrument"=="DEFAULT", it will generate a huge cube using all the particles and only will be used in the configuration file.
+    inst = params['cube_params']['instrument']
+    if inst.upper() != 'DIY' and inst.upper()!='DEFAULT':
         with open(instrumentDir + inst + '.json', 'r') as f:
             inst_params = json.load(f)
         for key in inst_params:
             params['cube_params'][key] = inst_params[key]
-    logger.info('Replace the instrument properties (spatial/spectral resolution/nbin) of %s with the ./instrument file.' % inst)
+        logger.info('INST mode, apply the %s instrument spatial properties from the preset file.' % inst)
+    elif inst.upper() == 'DEFAULT':
+        logger.info('DEFAULT mode, will use all the particles and only the given spatial resolution will be used.')
+    else:
+        logger.info("DIY mode, apply the given spatial resolution and bin number.")
 
 
-    # - - - - - LOAD TEMPLATES SPECTRA - - - - -
+
+    # - - - - - - - - - - LOAD SPECTRAL TEMPLATES - - - - - - - - - -
 
     logger.info('Loading SSP models...')
     t = clock()
@@ -99,7 +91,8 @@ def run_GalCraft(CommandOption):
     logger.info('SSP model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
 
 
-    # - - - - - LOAD STELLAR CATALOG - - - - -
+
+    # - - - - - - - - - - LOAD STELLAR CATALOG - - - - - - - - - -
 
     logger.info('Loading the E-Galaxia model from %s' % (modelDir + params['other_params']['model_name']))
     t = clock()
@@ -141,12 +134,14 @@ def run_GalCraft(CommandOption):
 
 
 
+
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # - - - - - - - - - -   A N A L Y S I S   M O D U L E S   - - - - - - - - - - -
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-    # - - - - - SPATIAL BINNING - - - - -
+
+    # - - - - - - - - - - SPATIAL BINNING - - - - - - - - - -
 
     if params['other_params']['mode'] != 'continue':
         logger.info('Start binning the model...')
@@ -165,7 +160,8 @@ def run_GalCraft(CommandOption):
     d_t = None
 
 
-    # - - - - - START DATACUBE LOOP  - - - - -
+
+    # - - - - - - - - - - START DATACUBE LOOP  - - - - - - - - - -
 
     for cube_idx in range(len(statistic_count_l)):
         d_t = d_t_l[cube_idx]
@@ -174,7 +170,8 @@ def run_GalCraft(CommandOption):
         y_edges = y_edges_l[cube_idx]
 
 
-    # - - - - - GENERATE DATACUBE  - - - - -
+
+    # - - - - - - - - - - GENERATE DATACUBE  - - - - - - - - - -
 
         if params['other_params']['mode'] == 'continue' and os.path.exists(filepath + 'data_cube_' + str(cube_idx) + '.fits'):
             logger.info("Data Cube No.%s exists in %s, will not be run in 'continue' mode" % (cube_idx+1, filepath))
@@ -209,6 +206,7 @@ def run_GalCraft(CommandOption):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
+
     # - - - - - SAVE CONFIG  - - - - -
 
     logger.info('Write the json file into the output folder.')
@@ -216,6 +214,9 @@ def run_GalCraft(CommandOption):
         json.dump(params, f, indent=2)
     logger.info('All the datacubes have been generated successfully, total time elapsed: %.2f s' % (clock() - t_init))
     logger.info("GalCraft completed successfully.")
+
+
+
 
 
 
@@ -231,13 +232,13 @@ def main(args=None):
             help="State the name of the MasterConfig file.")
     parser.add_option("--default-dir", dest="defaultDir", type="string", \
             help="File defining default directories for input, output, configuration files, and spectral templates.")
-    (CommandOption, args) = parser.parse_args()
+    (CommandOptions, args) = parser.parse_args()
 
     # Check if required command-line argument is given
-    assert CommandOption.configName != None, "Please specify the path of the Configuration.json file to be used. Exit!"
+    assert CommandOptions.configName != None, "Please specify the path of the Configuration.json file to be used. Exit!"
 
     # Run the framework
-    run_GalCraft(CommandOption)
+    run_GalCraft(CommandOptions)
 
 
 if __name__ == '__main__':

@@ -184,7 +184,7 @@ class SpecGeneratorPix():
                 result = result * mass[k] / (1e-20 * 4 * np.pi * (self.d_t_pixel[k]['dist']*3.08567758e21)**2 / (3.826e33))
 
                 if self.use_losvd == True:
-                    result = utils.doppler_shift_payne(self.wave_oversampled, result, vel[k])
+                    result = utils.doppler_shift(self.wave_oversampled, result, vel[k])
 
                 if self.use_extinc == True:
                     result = result * utils.reddening_cal00(self.wave_oversampled, self.d_t_pixel[k]['exbv'] / self.extinc_factor)
@@ -234,30 +234,3 @@ class SpecGeneratorPix():
                     "Initializing the interpolator ailed, the method has to be either 'nearest', 'linear', or 'interp_on_alpha'.")
 
         return interpolator
-
-
-
-
-
-
-    # def generate_spectrum(self, k):
-    #
-    #     particle = self.sample[k]
-    #
-    #     if self.interpolator_method == "nearest" or self.interpolator_method == "linear":
-    #         result = self.interpolator(particle)[0]
-    #
-    #     elif self.interpolator_method == "interp_on_alpha":
-    #         result_alpha00 = self.interpolator[0](particle[:-1])[0]
-    #         result_alpha04 = self.interpolator[1](particle[:-1])[0]
-    #         result = result_alpha00 * (1 - self.fraction[k]) + result_alpha04 * self.fraction[k]
-    #
-    #     result = result * self.d_t_pixel['mass'][k] / (
-    #                 1e-20 * 4 * np.pi * (self.d_t_pixel[k]['dist'] * 3.08567758e21) ** 2 / (3.826e33))
-    #
-    #     if self.use_losvd == True:
-    #         result = utils.doppler_shift_payne(self.wave_oversampled, result, self.d_t_pixel[k]['vr'])
-    #
-    #     if self.use_extinc == True:
-    #         result = result * utils.reddening_cal00(self.wave_oversampled,
-    #                                                 self.d_t_pixel[k]['exbv'] / self.extinc_factor)

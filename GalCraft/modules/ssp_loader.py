@@ -1,7 +1,7 @@
-from . import conroyinmiles_util as conroyinmiles_lib
-from . import pegase_interp_util as pegase_interp_lib
-from . import pegase_util as pegase_lib
-from . import miles_util as miles_lib
+from ..ssp_utils import pegase_util as pegase_lib, \
+    miles_util as miles_lib, \
+    pegase_interp_util as pegase_interp_lib, \
+    conroyinmiles_util as conroyinmiles_lib
 from . import utils
 import numpy as np
 from scipy import ndimage
@@ -26,7 +26,6 @@ class model:
         self.slope = ssp_params['slope']
         self.isochrone = ssp_params['isochrone']
         self.single_alpha = ssp_params['single_alpha']
-        # self.velscale = ssp_params['velscale']
         self.factor = ssp_params['factor']
         self.FWHM_gal = ssp_params['FWHM_gal']
         self.FWHM_tem = ssp_params['FWHM_tem']

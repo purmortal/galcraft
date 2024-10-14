@@ -32,6 +32,6 @@ jobs:
           python -m pip install .
           which GalCraft
 
-     - name: Run GalCraft
-       run: |
-         GalCraft --config test_kit --default-dir ./.github/workflows/tests/configFiles/defaultDir
+      - name: Run GalCraft
+        run: |
+          GalCraft --config test_kit --default-dir ./.github/workflows/tests/configFiles/defaultDir

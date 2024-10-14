@@ -34,4 +34,6 @@ jobs:
 
       - name: Run GalCraft
         run: |
-          GalCraft --config test_kit --default-dir ./.github/workflows/tests/configFiles/defaultDir
+          cd ./.github/workflows/tests
+          ls
+          GalCraft --config test_kit --default-dir configFiles/defaultDir

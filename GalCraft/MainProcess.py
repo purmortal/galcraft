@@ -10,6 +10,7 @@ import ebf
 import json
 import optparse
 from time import perf_counter as clock
+import multiprocessing
 
 import GalCraft.modules.ssp_loader as ssp_loader
 import GalCraft.modules.binner as binner
@@ -51,7 +52,8 @@ def run_GalCraft(CommandOptions):
     logger.info('Outputs DIR: %s' % filepath)
     # Setup cpu cores to use
     if params['other_params']['ncpu'] == None:
-        n_cores = len(os.sched_getaffinity(0))
+        # n_cores = len(os.sched_getaffinity(0))
+        n_cores = multiprocessing.cpu_count()
         logger.info('Change the CPU cores from %s to %s due to the CPU availability.' % (params['other_params']['ncpu'], n_cores) )
         params['other_params']['ncpu'] = n_cores
     else:

@@ -1,3 +1,10 @@
+1.2.1
+=====
+
+- Create test kit for github actions
+- Modify ``README.md``
+- Refine ``MainProcess.py``
+
 1.2.0
 =====
 

@@ -43,7 +43,7 @@ A detailed documentation of GalCraft will be available soon.
 
 
 ## Citing GalCraft
-If you use this software framework for any publication, please cite the original paper [Wang et al. (2024)](https://doi.org/10.1093/mnras/stae2148), which describes the method and its application to mock Milky Way observations.
+If you use this software framework for any publication, please cite the original paper [Wang et al. (2024)](https://ui.adsabs.harvard.edu/abs/2024MNRAS.534.1175W/abstract), which describes the method and its application to mock Milky Way observations.
 
 
 

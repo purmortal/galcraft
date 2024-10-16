@@ -37,6 +37,4 @@ jobs:
           wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
           unzip test_kit.zip
           cd galcraft-test_kit/tests/
-#          ls
-#          cd ./.github/workflows/tests
           GalCraft --config test_kit --default-dir configFiles/defaultDir

@@ -48,4 +48,4 @@ jobs:
 
       - name: Run tests
         run: |
-          python ./.github/workflows/tests/check_outputs.py
+          pytest ./.github/workflows/tests/check_outputs.py

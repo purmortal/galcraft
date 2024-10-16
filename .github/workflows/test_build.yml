@@ -34,13 +34,13 @@ jobs:
 
       - name: Download test kit
         run: |
+          cd ./.github/workflows/tests/
           wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
           unzip test_kit.zip
 
       - name: Run GalCraft
         run: |
-          cd galcraft-test_kit/tests/
-          pwd
+          cd ./.github/workflows/tests/galcraft-test_kit/tests/
           GalCraft --config test_kit --default-dir configFiles/defaultDir
 
       - name: Install pytest

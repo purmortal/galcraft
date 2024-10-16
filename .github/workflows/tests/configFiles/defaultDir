@@ -1,4 +1,0 @@
-configDir=./configFiles/
-outputDir=./output/
-modelDir=./modelFiles/
-templateDir=./spectralTemplates/

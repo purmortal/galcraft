@@ -36,10 +36,15 @@ jobs:
         run: |
           wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
           unzip test_kit.zip
-          pwd
 
       - name: Run GalCraft
         run: |
           cd galcraft-test_kit/tests/
-          pwd
           GalCraft --config test_kit --default-dir configFiles/defaultDir
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run tests
+        run: |
+          pytest ./.github/workflows/tests/check_outputs.py

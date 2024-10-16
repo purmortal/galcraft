@@ -10,6 +10,7 @@ import ebf
 import json
 import optparse
 from time import perf_counter as clock
+import multiprocessing
 
 import GalCraft.modules.ssp_loader as ssp_loader
 import GalCraft.modules.binner as binner
@@ -40,18 +41,19 @@ def run_GalCraft(CommandOptions):
     # Load the Configuration file
     with open(configDir + setup_cube_name + '.json', 'r') as f:
         params = json.load(f)
-    # Setup the output folder
+    # Setup the outputs folder
     filepath = outputDir + cube_name + '/'
     if os.path.exists(filepath)==False: os.mkdir(filepath[:-1])
     # Setup logger
     if params['other_params']['mode'] == 'continue': # For continue mode, change the logger mode from 'w' to 'a'
         params['other_params']['log_mode'] = 'a'
-    logger = Logger(logfile=filepath + 'output.log', mode=params['other_params']['log_mode']).get_log()
+    logger = Logger(logfile=filepath + 'outputs.log', mode=params['other_params']['log_mode']).get_log()
     logger.info('Loaded the setup file (path %s)' % (configDir + setup_cube_name + '.json'))
     logger.info('Outputs DIR: %s' % filepath)
     # Setup cpu cores to use
     if params['other_params']['ncpu'] == None:
-        n_cores = len(os.sched_getaffinity(0))
+        # n_cores = len(os.sched_getaffinity(0))
+        n_cores = multiprocessing.cpu_count()
         logger.info('Change the CPU cores from %s to %s due to the CPU availability.' % (params['other_params']['ncpu'], n_cores) )
         params['other_params']['ncpu'] = n_cores
     else:
@@ -209,7 +211,7 @@ def run_GalCraft(CommandOptions):
 
     # - - - - - SAVE CONFIG  - - - - -
 
-    logger.info('Write the json file into the output folder.')
+    logger.info('Write the json file into the outputs folder.')
     with open(filepath + 'setup.json', 'w') as f:
         json.dump(params, f, indent=2)
     logger.info('All the datacubes have been generated successfully, total time elapsed: %.2f s' % (clock() - t_init))
@@ -231,7 +233,7 @@ def main(args=None):
     parser.add_option("--config",      dest="configName", type="string", \
             help="State the name of the MasterConfig file.")
     parser.add_option("--default-dir", dest="defaultDir", type="string", \
-            help="File defining default directories for input, output, configuration files, and spectral templates.")
+            help="File defining default directories for input, outputs, configuration files, and spectral templates.")
     (CommandOptions, args) = parser.parse_args()
 
     # Check if required command-line argument is given

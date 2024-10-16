@@ -70,7 +70,7 @@ def reddening_cal00(lam, ebv):
     - LAMBDA is the restframe wavelength in Angstrom of each pixel in the
       input galaxy spectrum (1 Angstrom = 1e-4 micrometres)
     - EBV is the assumed E(B-V) colour excess to redden the spectrum.
-      In output the vector FRAC gives the fraction by which the flux at each
+      In outputs the vector FRAC gives the fraction by which the flux at each
       wavelength has to be multiplied, to model the dust reddening effect.
 
     """

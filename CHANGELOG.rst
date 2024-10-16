@@ -1,3 +1,11 @@
+1.3.0
+=====
+
+- Create test kit for github actions
+- Modify ``README.md``
+- Refine ``MainProcess.py``
+- add branch ``test_kit``
+
 1.2.0
 =====
 

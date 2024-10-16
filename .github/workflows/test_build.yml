@@ -39,8 +39,6 @@ jobs:
 
       - name: Run GalCraft
         run: |
-          cd
-          pwd
           cd galcraft-test_kit/tests/
           pwd
           GalCraft --config test_kit --default-dir configFiles/defaultDir

@@ -32,9 +32,14 @@ jobs:
           python -m pip install .
           which GalCraft
 
-      - name: Run GalCraft
+      - name: Download test kit
         run: |
           wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
           unzip test_kit.zip
+          pwd
           cd galcraft-test_kit/tests/
+          pwd
+
+      - name: Run GalCraft
+        run: |
           GalCraft --config test_kit --default-dir configFiles/defaultDir

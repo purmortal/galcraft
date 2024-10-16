@@ -18,7 +18,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
     :param age_grid: age grid of SSP templates
     :param metal_grid: metallicity grid of SSP templates
     :param alpha_grid: alpha grid of SSP templates
-    :param filepath: output file path of this run
+    :param filepath: outputs file path of this run
     :param logger: log file
     :param input_arg: setup input cube name path
     :param galaxy_dist: galaxy distance to the observer
@@ -160,7 +160,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
                                                                  cmap=plt.cm.Spectral_r, cblabel='V_std (km/s)', color_Lognorm=False)
         plt.tight_layout()
         plt.savefig(filepath + 'particles_distrib.png', dpi=150)
-        logger.info('The plot has been finished and saved into the output folder.')
+        logger.info('The plot has been finished and saved into the outputs folder.')
 
 
 

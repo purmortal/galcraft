@@ -211,7 +211,7 @@ class model:
                                     np.interp(wave, lsf_tem[:, 0], lsf_tem[:, 1]),
                                     np.diff(wave)[0])
 
-        assert np.any(np.isnan(sig)) == False, "The output FWHM_gal is lower than the SSP FWHM_tem."
+        assert np.any(np.isnan(sig)) == False, "The outputs FWHM_gal is lower than the SSP FWHM_tem."
 
 
         self.templates = templates

@@ -40,6 +40,7 @@ jobs:
       - name: Run GalCraft
         run: |
           cd galcraft-test_kit/tests/
+          pwd
           GalCraft --config test_kit --default-dir configFiles/defaultDir
 
       - name: Install pytest

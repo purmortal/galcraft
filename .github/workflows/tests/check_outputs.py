@@ -7,4 +7,4 @@ test_dir = Path(__file__).parent
 true_dir = test_dir / "outputs"
 outputs_dir = test_dir / "truth"
 
-print(output_dir, true_dir)
+print(outputs_dir, true_dir)

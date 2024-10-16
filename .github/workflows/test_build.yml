@@ -39,7 +39,7 @@ jobs:
 
       - name: Run GalCraft
         run: |
-          cd ~
+          cd
           pwd
           cd galcraft-test_kit/tests/
           pwd

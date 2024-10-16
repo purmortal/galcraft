@@ -12,8 +12,6 @@ jobs:
         include:
           - os: linux
             os-version: ubuntu-latest
-          # - os: macos
-          #   os-version: macos-latest
 
     runs-on: ${{ matrix.os-version }}
 

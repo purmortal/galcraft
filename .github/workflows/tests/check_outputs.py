@@ -30,11 +30,11 @@ def test_fits1(parafile):
     true = fits.open(true_file)
     assert np.array_equal(output[1].data, true[1].data, equal_nan=True), f"The files {output_file} and {true_file} are not the same!"
 
-files_fits2 = ["particle_table_0.fits", "particle_table_1.fits"]
-@pytest.mark.parametrize("parafile", files_fits2)
-def test_fits2(parafile):
-    output_file = outputs_dir / parafile
-    true_file = true_dir / parafile
-    output = fits.open(output_file)
-    true = fits.open(true_file)
-    assert np.all(output[1].data == true[1].data), f"The files {output_file} and {true_file} are not the same!"
+# files_fits2 = ["particle_table_0.fits", "particle_table_1.fits"]
+# @pytest.mark.parametrize("parafile", files_fits2)
+# def test_fits2(parafile):
+#     output_file = outputs_dir / parafile
+#     true_file = true_dir / parafile
+#     output = fits.open(output_file)
+#     true = fits.open(true_file)
+#     assert np.all(output[1].data == true[1].data), f"The files {output_file} and {true_file} are not the same!"

@@ -34,5 +34,9 @@ jobs:
 
       - name: Run GalCraft
         run: |
+          wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
+          unzip test_kit.zip
+          cd test_kit
+          ls
           cd ./.github/workflows/tests
           GalCraft --config test_kit --default-dir configFiles/defaultDir

@@ -18,7 +18,7 @@
     "dlam": null,
     "age_range": null,
     "metal_range": null,
-    "wave_range": null,
+    "wave_range": [4500, 4700],
     "spec_interpolator": "linear"
   },
   "cube_params": {

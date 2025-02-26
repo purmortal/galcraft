@@ -1,7 +1,8 @@
 from ..ssp_utils import pegase_util as pegase_lib, \
     miles_util as miles_lib, \
     pegase_interp_util as pegase_interp_lib, \
-    conroyinmiles_util as conroyinmiles_lib
+    conroyinmiles_util as conroyinmiles_lib, \
+    xshooter_util as xshooter_lib
 from . import utils
 import numpy as np
 from scipy import ndimage
@@ -152,6 +153,10 @@ class model:
                 models.append(conroyinmiles_lib.conroy(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit_moremetalalpha/' + 'alpha_0/',
                                                        FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
 
+        elif self.ssp_name == 'xshooter':
+            assert self.single_alpha == True, "No alpha-enhanced model avaliable for X-shooter yet."
+            models.append(xshooter_lib.xshooter(templateDir + 'xshooter/' + 'XSHOOTER_' + self.isochrone + '_' + self.imf + '_baseFe/XSL_SSP_*.fits',
+                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
 
         templates = np.stack([model.templates for model in models], axis=3)
 
@@ -207,11 +212,20 @@ class model:
             lsf_tem = np.zeros([len(wave), 2])
             lsf_tem[:, 0] = wave
             lsf_tem[:, 1] = self.FWHM_tem
-        sig = utils.cal_degrade_sig(np.interp(wave, lsf_gal[:, 0], lsf_gal[:, 1]),
-                                    np.interp(wave, lsf_tem[:, 0], lsf_tem[:, 1]),
+        sig = utils.cal_degrade_sig(np.interp(wave, lsf_gal[:, 0], lsf_gal[:, 1], left=np.nan, right=np.nan),
+                                    np.interp(wave, lsf_tem[:, 0], lsf_tem[:, 1], left=np.nan, right=np.nan),
                                     np.diff(wave)[0])
 
-        assert np.any(np.isnan(sig)) == False, "The outputs FWHM_gal is lower than the SSP FWHM_tem."
+        if np.all(np.isnan(sig)) == True:
+            raise ValueError("The outputs FWHM_gal is lower than the SSP FWHM_tem.")
+        elif np.any(np.isnan(sig)) == True:
+            logger.info("FWHM_gal is smaller than the SSP FWHM_tem in some wavelength pixels, will remove them and contiue the program...")
+            mask_nansig = ~np.isnan(sig)
+            wave = wave[mask_nansig]
+            templates = templates[mask_nansig, :, :]
+            sig = sig[mask_nansig]
+        else:
+            logger.info("FWHM_gal is larger than the SSP FWHM_tem for some wavelength pixels, continue the program...")
 
 
         self.templates = templates
@@ -254,10 +268,11 @@ class model:
         logger.info('alpha_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
         logger.info('templates dim:         %s' % list(reg_dim))
         logger.info('n_templates:           %s' % np.prod(reg_dim))
+        logger.info('SSP wave range:        %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])
         if self.wave_range==None:
-            logger.info('wave range:            %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
+            logger.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
         else:
-            logger.info('wave range:            %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
+            logger.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
         logger.info('============================================')
 
 

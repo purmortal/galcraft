@@ -1,3 +1,12 @@
+1.4.0
+=====
+
+- Add script ``xshooter_util.py`` to load X-shooter SSP model
+- Add X-shooter LSF file ``lsf_xshooter``
+- Implement ``ssp_loader.py`` for X-shooter
+- Update ``README.md``
+- Fix the issue of `sig` in ``ssp_loader.py`` when `FWHM_gal` is smaller than `FWHM_tem` for some pixels, \change to just use the pixels with `FWHM_gal` > `FWHM_tem`.
+
 1.3.1
 =====
 

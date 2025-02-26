@@ -5,8 +5,8 @@
 [![pypi](https://img.shields.io/badge/python-pypi-blue.svg)](https://pypi.org/project/GalCraft/)
 [![arXiv](https://img.shields.io/badge/arxiv-2310.18258-b31b1b.svg)](https://arxiv.org/abs/2310.18258)
 [![DOI](https://img.shields.io/badge/DOI-10.1093%2Fmnras%2Fstae2148-green.svg)](https://doi.org/10.1093/mnras/stae2148)
-
-[//]: # ([![LICENSE]&#40;https://img.shields.io/badge/license-MIT-blue.svg?style=flat&#41;]&#40;https://github.com/purmortal/galcraft/blob/main/LICENSE&#41;)
+[![ASCL](https://img.shields.io/badge/ASCL-2410.001-%23262255.svg)](https://ascl.net/2410.001)
+[![LICENSE](https://img.shields.io/badge/lisence-MIT-blue.svg)](https://github.com/purmortal/galcraft/blob/main/LICENSE)
 
 GalCraft is a flexible software to create mock IFS observations of the Milky Way and other hydrodynamical/N-body simulations. It is entirely written in Python3 and conducts all the procedures from inputting data and spectral templates to the output of IFS data cubes in `fits` format. 
 
@@ -82,6 +82,6 @@ This software is governed by the MIT License. In brief, you can use, distribute,
 
 
 ## Contact 
-- Zixian Wang (University of Utah, wang.zixian.astro@gmail.com)
+- Zixian Wang (University of Utah, wang.zixian.astro@gmail.com; zixian.wang@utah.edu)
 - Michael Hayden (University of Oklahoma, mrhayden@ou.edu)
 - Sanjib Sharma (Space Telescope Science Institute, ssharma@stsci.edu)

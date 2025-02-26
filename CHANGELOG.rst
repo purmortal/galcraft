@@ -1,3 +1,8 @@
+1.4.1
+=====
+- Update test kit files due to the change of FWHM strategy in `ssp_loader.py`
+- Fix a problem in `ssp_loader.py`
+
 1.4.0
 =====
 

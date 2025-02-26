@@ -225,7 +225,7 @@ class model:
             templates = templates[mask_nansig, :, :]
             sig = sig[mask_nansig]
         else:
-            logger.info("FWHM_gal is larger than the SSP FWHM_tem for some wavelength pixels, continue the program...")
+            logger.info("FWHM_gal is larger than the SSP FWHM_tem for all wavelength pixels, continue the program...")
 
 
         self.templates = templates

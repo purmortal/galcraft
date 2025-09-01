@@ -1,4 +1,6 @@
 import os
+import time
+import logging
 import numpy as np
 from multiprocessing import Pool
 from time import perf_counter as clock
@@ -7,6 +9,28 @@ from scipy.stats import binned_statistic_2d
 
 import matplotlib.colors as colors
 from matplotlib import pyplot as plt
+
+
+def setupLogfile(logfile, __version__, mode='a', welcome=True):
+    """Initialise the LOGFILE."""
+    welcomeString = "\n\n# ============================================== #\n#{:^48}#\n#{:^48}#\n# ============================================== #\n".format(
+        "GalCraft", "Version " + __version__
+    )
+
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+    logging.basicConfig(
+        handlers=[
+            logging.FileHandler(logfile, mode=mode),
+            logging.StreamHandler()
+        ],
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)-8s - %(module)s: %(message)s",
+        datefmt="%m/%d/%y %H:%M:%S",
+    )
+    logging.Formatter.converter = time.gmtime
+    if welcome == True:
+        logging.info(welcomeString)
 
 
 ##################################################################################

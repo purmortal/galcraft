@@ -29,7 +29,7 @@ setup(name='GalCraft',
       },
       install_requires=[
           'astropy',
-          'numpy',
+          'numpy<=2.2.6',
           'scipy',
           'matplotlib',
           'ebfpy',

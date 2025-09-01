@@ -1,4 +1,5 @@
 from . import utils
+import logging
 import numpy as np
 from astropy.table import Table
 from scipy.stats import binned_statistic_2d
@@ -8,7 +9,7 @@ from matplotlib.patches import Rectangle
 
 
 def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_grid,
-                   filepath, logger, input_arg, galaxy_dist, nparticles):
+                   filepath, input_arg, galaxy_dist, nparticles):
     '''
     Preparing the stellar particle catalog, N_particle spatial distribution,
     x and y axis edges from the loaded particle catalog and data cube configurations.
@@ -18,8 +19,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
     :param age_grid: age grid of SSP templates
     :param metal_grid: metallicity grid of SSP templates
     :param alpha_grid: alpha grid of SSP templates
-    :param filepath: outputs file path of this run
-    :param logger: log file
+    :param filepath: outputs file path of this runZ
     :param input_arg: setup input cube name path
     :param galaxy_dist: galaxy distance to the observer
     :param nparticles: number of particles in the catalog
@@ -37,15 +37,15 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
     if cube_params['instrument'].upper() != "DEFAULT":
-        logger.info('Load the cube list from %s' % (input_arg + '_list'))
+        logging.info('Load the cube list from %s' % (input_arg + '_list'))
         cube_centers = np.genfromtxt(input_arg + '_list', dtype=float, delimiter=',')
         if len(cube_centers.shape) == 1:
             cube_centers = np.array([cube_centers])
-        logger.info('Load the list of center positions of data cubes.')
+        logging.info('Load the list of center positions of data cubes.')
         nbin_x = cube_params['spatial_nbin'][0]
         nbin_y = cube_params['spatial_nbin'][1]
     else:
-        logger.info(
+        logging.info(
             'The instrument is in %s, will generate a huge cube using all the particles.' % cube_params['instrument'].upper())
         if cube_params['spatial_percentile'] == True:
             x_edges = np.arange(np.percentile(d_t[x_coord], 0.05),
@@ -63,36 +63,36 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
 
-    logger.info('================Cube info=================')
-    logger.info('x_coordinate:          %s' % x_coord)
-    logger.info('y_coordinate:          %s' % y_coord)
-    logger.info('instrument:            %s' % cube_params['instrument'])
-    logger.info('Spatial resolution:    %s' % spatial_resolution)
-    logger.info('n_bins in x and y:     %s' % [nbin_x, nbin_y])
-    logger.info('Number of cubes:       %s' % len(cube_centers))
-    logger.info('         %s          %s' % (x_coord, y_coord))
+    logging.info('================Cube info=================')
+    logging.info('x_coordinate:          %s' % x_coord)
+    logging.info('y_coordinate:          %s' % y_coord)
+    logging.info('instrument:            %s' % cube_params['instrument'])
+    logging.info('Spatial resolution:    %s' % spatial_resolution)
+    logging.info('n_bins in x and y:     %s' % [nbin_x, nbin_y])
+    logging.info('Number of cubes:       %s' % len(cube_centers))
+    logging.info('         %s          %s' % (x_coord, y_coord))
     for i in range(len(cube_centers)):
-        logger.info('      %.3f      %.3f' % (cube_centers[i][0], cube_centers[i][1]))
-    logger.info('use losvd?:            %s' % cube_params['use_losvd'])
-    logger.info('use extinc?:           %s' % cube_params['use_extinc'])
-    logger.info('extinc factor:         %s' % cube_params['extinc_factor'])
-    logger.info('use dist? :            %s' % cube_params['use_dist'])
-    logger.info('add noise?:            %s' % cube_params['add_noise'])
-    logger.info('bootstrapping?:        %s' % cube_params['bootstrap_table'])
-    logger.info('==========================================')
+        logging.info('      %.3f      %.3f' % (cube_centers[i][0], cube_centers[i][1]))
+    logging.info('use losvd?:            %s' % cube_params['use_losvd'])
+    logging.info('use extinc?:           %s' % cube_params['use_extinc'])
+    logging.info('extinc factor:         %s' % cube_params['extinc_factor'])
+    logging.info('use dist? :            %s' % cube_params['use_dist'])
+    logging.info('add noise?:            %s' % cube_params['add_noise'])
+    logging.info('bootstrapping?:        %s' % cube_params['bootstrap_table'])
+    logging.info('==========================================')
 
 
     if 'cube_m_h' in d_t.keys() and 'cube_alpha_fe' in d_t.keys() and 'cube_age' in d_t.keys():
-        logger.info("Not create the 'cube_x', 'mass', 'dist' columns, already exist.")
+        logging.info("Not create the 'cube_x', 'mass', 'dist' columns, already exist.")
         d_t['cube_m_h'] = np.clip(d_t['cube_m_h'], metal_grid[0], metal_grid[-1])
         d_t['cube_alpha_fe'] = np.clip(d_t['cube_alpha_fe'], alpha_grid[0], alpha_grid[-1])
         d_t['cube_age'] = np.clip(d_t['cube_age'], age_grid[0], age_grid[-1])
         d_t['cube_logage'] = np.log10(d_t['cube_age']) + 9
     else:
-        logger.info('Make the initial mass to be 1 M_sun.')
+        logging.info('Make the initial mass to be 1 M_sun.')
         d_t['mass'] = np.ones(d_t['m_ini'].shape)  # Make the mass equal to 1
         # np.clip the values in ([M/H], [alpha/Fe], age)
-        logger.info('Transfer from [Fe/H] to [M/H], clipping [M/H], age and [alpha/Fe].')
+        logging.info('Transfer from [Fe/H] to [M/H], clipping [M/H], age and [alpha/Fe].')
         d_t['m_h'] = d_t['fe_h'] + np.log10(0.684 * (10 ** d_t['alpha_fe']) + 0.306)
         d_t['cube_m_h'] = np.clip(d_t['m_h'], metal_grid[0], metal_grid[-1])
         d_t['cube_alpha_fe'] = np.clip(d_t['alpha_fe'], alpha_grid[0], alpha_grid[-1])
@@ -120,7 +120,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
                             np.percentile(d_t[y_coord], 99.95) + spatial_resolution_deg[1], spatial_resolution_deg[1])
 
     if other_params['plot_statistics'] == True:
-        logger.info('Plotting the statistical distribution using several parameters using the original particles...')
+        logging.info('Plotting the statistical distribution using several parameters using the original particles...')
         plt.figure(figsize=[12, 10])
         plt.subplot(321)
         im, ax, num_counts, xbins, ybins = utils.plot_binned_grids_color(x=d_t[x_coord], y=d_t[y_coord], values=d_t['vr'],
@@ -160,22 +160,22 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
                                                                  cmap=plt.cm.Spectral_r, cblabel='V_std (km/s)', color_Lognorm=False)
         plt.tight_layout()
         plt.savefig(filepath + 'particles_distrib.png', dpi=150)
-        logger.info('The plot has been finished and saved into the outputs folder.')
+        logging.info('The plot has been finished and saved into the outputs folder.')
 
 
 
     d_t = Table(d_t)
     if cube_params['invert_b'] == True:
         d_t['b'] = -d_t['b']
-        logger.info('Invert b coordinates due to the wrong inclination used.')
+        logging.info('Invert b coordinates due to the wrong inclination used.')
     if cube_params['bootstrap_table'] == True:
         d_t = d_t[np.random.randint(len(d_t), size=len(d_t))]
-        logger.info('Randomly Sample the table for a bootstrapping process.')
+        logging.info('Randomly Sample the table for a bootstrapping process.')
     if other_params['mode'] == 'debug':
         d_t = d_t[np.random.randint(len(d_t), size=nparticles)]
-        logger.info("Running mode is 'debug', randomly selecting %s particles." % nparticles)
+        logging.info("Running mode is 'debug', randomly selecting %s particles." % nparticles)
         if other_params['write_table'] == True:
-            logger.info('Writing the model into astropy.table')
+            logging.info('Writing the model into astropy.table')
             d_t.write(filepath + 'particle_table.fits', format='fits', overwrite=True)
 
 
@@ -216,13 +216,13 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
         if other_params['write_table'] == True:
-            logger.info('Write the E-Galaxia model into astropy.Table of particles %s in datacube No.%s' % (len(d_t_i), i + 1))
+            logging.info('Write the E-Galaxia model into astropy.Table of particles %s in datacube No.%s' % (len(d_t_i), i + 1))
             d_t_i.write(filepath + 'particle_table_' + str(i) + '.fits', format='fits', overwrite=True)
 
 
         # save the statistic_count into npy array
         np.save(filepath + 'statistic_count' + str(i) + '.npy', np.flip(statistic_count.T, axis=1))
-        logger.info('Write the number of stars array into file using particles %s in datacube No.%s' % (len(d_t_i), i + 1))
+        logging.info('Write the number of stars array into file using particles %s in datacube No.%s' % (len(d_t_i), i + 1))
 
         d_t_l.append(d_t_i)
         statistic_count_l.append(statistic_count)
@@ -230,7 +230,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
         y_edges_l.append(y_edges)
 
 
-    logger.info('Plotting the distribution of the datacubes on the Galaxy.')
+    logging.info('Plotting the distribution of the datacubes on the Galaxy.')
     plt.figure(figsize=[6, 2.5])
     ax = plt.subplot(111)
     im, ax, num_counts, xbins, ybins = utils.plot_binned_grids_color(x=d_t[x_coord], y=d_t[y_coord], values=d_t['vr'],
@@ -249,7 +249,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
                                alpha=1, facecolor='none', edgecolor='slateblue', linewidth=1.6))
     plt.tight_layout(pad=0.03)
     plt.savefig(filepath + 'datacube_distrib.png', dpi=150)
-    logger.info('The figure was successfully saved.')
+    logging.info('The figure was successfully saved.')
 
     np.savetxt(filepath + 'cube_list', cube_centers, delimiter=',')
 
@@ -259,7 +259,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
 
-def spatial_binner_continue(cube_params, other_params, filepath, logger, input_arg):
+def spatial_binner_continue(cube_params, other_params, filepath, input_arg):
     '''
     Same as function spatial_binner but in "continue" mode
     '''
@@ -275,31 +275,31 @@ def spatial_binner_continue(cube_params, other_params, filepath, logger, input_a
 
     assert cube_params['instrument'].upper() != "DEFAULT", "There has to be an instrument assigned for running the 'continue' mode."
 
-    logger.info('Load the cube list from %s' % (filepath + 'cube_list'))
+    logging.info('Load the cube list from %s' % (filepath + 'cube_list'))
     cube_centers = np.genfromtxt(input_arg + '_list', dtype=float, delimiter=',')
     if len(cube_centers.shape) == 1:
         cube_centers = np.array([cube_centers])
-    logger.info('Load the list of center positions of data cubes.')
+    logging.info('Load the list of center positions of data cubes.')
     nbin_x = cube_params['spatial_nbin'][0]
     nbin_y = cube_params['spatial_nbin'][1]
 
 
 
-    logger.info('================Cube info=================')
-    logger.info('x_coordinate:          %s' % x_coord)
-    logger.info('y_coordinate:          %s' % y_coord)
-    logger.info('instrument:            %s' % cube_params['instrument'])
-    logger.info('Spatial resolution:    %s' % spatial_resolution)
-    logger.info('n_bins in x and y:     %s' % [nbin_x, nbin_y])
-    logger.info('Number of cubes:       %s' % len(cube_centers))
-    logger.info('         %s          %s' % (x_coord, y_coord))
+    logging.info('================Cube info=================')
+    logging.info('x_coordinate:          %s' % x_coord)
+    logging.info('y_coordinate:          %s' % y_coord)
+    logging.info('instrument:            %s' % cube_params['instrument'])
+    logging.info('Spatial resolution:    %s' % spatial_resolution)
+    logging.info('n_bins in x and y:     %s' % [nbin_x, nbin_y])
+    logging.info('Number of cubes:       %s' % len(cube_centers))
+    logging.info('         %s          %s' % (x_coord, y_coord))
     for i in range(len(cube_centers)):
-        logger.info('      %.3f      %.3f' % (cube_centers[i][0], cube_centers[i][1]))
-    logger.info('use losvd?:            %s' % cube_params['use_losvd'])
-    logger.info('use dist? :            %s' % cube_params['use_dist'])
-    logger.info('add noise?:            %s' % cube_params['add_noise'])
-    logger.info('bootstrapping?:        %s' % cube_params['bootstrap_table'])
-    logger.info('==========================================')
+        logging.info('      %.3f      %.3f' % (cube_centers[i][0], cube_centers[i][1]))
+    logging.info('use losvd?:            %s' % cube_params['use_losvd'])
+    logging.info('use dist? :            %s' % cube_params['use_dist'])
+    logging.info('add noise?:            %s' % cube_params['add_noise'])
+    logging.info('bootstrapping?:        %s' % cube_params['bootstrap_table'])
+    logging.info('==========================================')
 
 
     d_t_l = []
@@ -320,10 +320,10 @@ def spatial_binner_continue(cube_params, other_params, filepath, logger, input_a
 
 
         d_t_i = Table.read(filepath + 'particle_table_' + str(i) + '.fits')
-        logger.info(
+        logging.info(
             'Read the E-Galaxia model table of particles %s in datacube No.%s' % (len(d_t_i), i + 1))
         statistic_count = np.flip(np.load(filepath + 'statistic_count' + str(i) + '.npy'), axis=1).T
-        logger.info(
+        logging.info(
             'Read the number of stars array into file using particles %s in datacube No.%s' % (len(d_t_i), i + 1))
 
         d_t_l.append(d_t_i)

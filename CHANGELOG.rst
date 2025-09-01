@@ -1,3 +1,8 @@
+1.4.2
+=====
+- Add a version limit for numpy to be <=2.2.6 given numpy.fromstring is removed since then
+- Fix the logging issue for Mac that is not printed in terminal (multiprocessing logging still not printing)
+
 1.4.1
 =====
 - Update test kit files due to the change of FWHM strategy in `ssp_loader.py`

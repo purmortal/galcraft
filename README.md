@@ -34,12 +34,16 @@ pip install .
 
 ## Example
 
-Follow the command below to generate your first mock MUSE data cube by GalCraft:
+Follow the commands below to download test kit:
 
 ```
 wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
 unzip test_kit.zip
 cd galcraft-test_kit/tests/
+```
+
+Then generate your first mock data using GalCraft command:
+```
 GalCraft --config test_kit --default-dir configFiles/defaultDir
 ```
 
@@ -82,6 +86,6 @@ This software is governed by the MIT License. In brief, you can use, distribute,
 
 
 ## Contact 
-- Zixian Wang (University of Utah, wang.zixian.astro@gmail.com; zixian.wang@utah.edu)
-- Michael Hayden (University of Oklahoma, mrhayden@ou.edu)
-- Sanjib Sharma (Space Telescope Science Institute, ssharma@stsci.edu)
+- Zixian Wang (wang.zixian.astro@gmail.com; zixian.wang@utah.edu)
+- Michael Hayden (mrhayden@ou.edu)
+- Sanjib Sharma (ssharma@stsci.edu)

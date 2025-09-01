@@ -3,6 +3,7 @@ os.environ["MKL_NUM_THREADS"] = "1"
 os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
 
+import logging
 from . import utils
 import numpy as np
 import collections
@@ -19,7 +20,7 @@ class SpecGeneratorPix():
 
     def __init__(self, d_t, xb, yb, zb, logage_grid, metal_grid, alpha_grid, x_edges, y_edges, use_losvd, use_extinc,
                  extinc_factor, single_alpha, templatesOversampled_shape, new_wave, wave_oversampled,
-                 sig_oversampled, factor, logger, templatesTransposed, interpolator_method):
+                 sig_oversampled, factor, templatesTransposed, interpolator_method):
 
         self.d_t = d_t
         self.xb = xb
@@ -39,7 +40,6 @@ class SpecGeneratorPix():
         self.sig_oversampled = sig_oversampled.copy()
         self.templatesOversampled_shape = templatesOversampled_shape
         self.factor = factor
-        self.logger = logger
         self.templatesTransposed = templatesTransposed.copy()
         self.interpolator_method = interpolator_method
 
@@ -204,7 +204,7 @@ class SpecGeneratorPix():
             galaxy_rebin = np.zeros(int(self.templatesOversampled_shape[0] / self.factor))
 
 
-        self.logger.info('Generated a spectrum for spatial pixel %s using %s particles, time elapsed: %.2f s' % ([int(i), int(j)], len(self.d_t_pixel), clock() - t))
+        logging.info('Generated a spectrum for spatial pixel %s using %s particles, time elapsed: %.2f s' % ([int(i), int(j)], len(self.d_t_pixel), clock() - t))
         return SpecResult(mass_fraction_pixel=mass_fraction_pixel, galaxy_rebin=galaxy_rebin, i=i, j=j)
 
 

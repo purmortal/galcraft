@@ -6,6 +6,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"
 os.environ["OMP_NUM_THREADS"] = "1"
 import warnings
 warnings.filterwarnings("ignore")
+import logging
 import ebf
 import json
 import optparse
@@ -18,7 +19,6 @@ import GalCraft.modules.spec_generator as spec_generator
 import GalCraft.modules.cube_maker as cube_maker
 import GalCraft.modules.cot as cot
 import GalCraft.modules.utils as utils
-from GalCraft.modules.log import Logger
 from GalCraft._version import __version__
 
 
@@ -47,17 +47,17 @@ def run_GalCraft(CommandOptions):
     # Setup logger
     if params['other_params']['mode'] == 'continue': # For continue mode, change the logger mode from 'w' to 'a'
         params['other_params']['log_mode'] = 'a'
-    logger = Logger(logfile=filepath + 'outputs.log', mode=params['other_params']['log_mode']).get_log()
-    logger.info('Loaded the setup file (path %s)' % (configDir + setup_cube_name + '.json'))
-    logger.info('Outputs DIR: %s' % filepath)
+    utils.setupLogfile(logfile=filepath + 'outputs.log', __version__=__version__, mode=params['other_params']['log_mode'], welcome=True)
+    logging.info('Loaded the setup file (path %s)' % (configDir + setup_cube_name + '.json'))
+    logging.info('Outputs DIR: %s' % filepath)
     # Setup cpu cores to use
     if params['other_params']['ncpu'] == None:
         # n_cores = len(os.sched_getaffinity(0))
         n_cores = multiprocessing.cpu_count()
-        logger.info('Change the CPU cores from %s to %s due to the CPU availability.' % (params['other_params']['ncpu'], n_cores) )
+        logging.info('Change the CPU cores from %s to %s due to the CPU availability.' % (params['other_params']['ncpu'], n_cores) )
         params['other_params']['ncpu'] = n_cores
     else:
-        logger.info('Run the framework using %s CPU cores.' % params['other_params']['ncpu'])
+        logging.info('Run the framework using %s CPU cores.' % params['other_params']['ncpu'])
 
 
 
@@ -76,36 +76,36 @@ def run_GalCraft(CommandOptions):
             inst_params = json.load(f)
         for key in inst_params:
             params['cube_params'][key] = inst_params[key]
-        logger.info('INST mode, apply the %s instrument spatial properties from the preset file.' % inst)
+        logging.info('INST mode, apply the %s instrument spatial properties from the preset file.' % inst)
     elif inst.upper() == 'DEFAULT':
-        logger.info('DEFAULT mode, will use all the particles and only the given spatial resolution will be used.')
+        logging.info('DEFAULT mode, will use all the particles and only the given spatial resolution will be used.')
     else:
-        logger.info("DIY mode, apply the given spatial resolution and bin number.")
+        logging.info("DIY mode, apply the given spatial resolution and bin number.")
 
 
 
     # - - - - - - - - - - LOAD SPECTRAL TEMPLATES - - - - - - - - - -
 
-    logger.info('Loading SSP models...')
+    logging.info('Loading SSP models...')
     t = clock()
-    ssp_model = ssp_loader.model(templateDir, instrumentDir, params['ssp_params'], params['other_params'], logger)
+    ssp_model = ssp_loader.model(templateDir, instrumentDir, params['ssp_params'], params['other_params'])
     ssp_model.oversample()
-    logger.info('SSP model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
+    logging.info('SSP model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
 
 
 
     # - - - - - - - - - - LOAD STELLAR CATALOG - - - - - - - - - -
 
-    logger.info('Loading the E-Galaxia model from %s' % (modelDir + params['other_params']['model_name']))
+    logging.info('Loading the E-Galaxia model from %s' % (modelDir + params['other_params']['model_name']))
     t = clock()
     d_t = ebf.read(modelDir + params['other_params']['model_name'],'/')
     # Check the need to locate/rotate the E-Galaxia model.
     if 'vr' in d_t.keys():
-        logger.info('Model has already been rotated, no location/rotation transformation is applied.')
+        logging.info('Model has already been rotated, no location/rotation transformation is applied.')
         for key in params['oparams']:
             params['oparams'][key] = None
     else:
-        logger.info('Specifing the location/rotation of the galaxy')
+        logging.info('Specifing the location/rotation of the galaxy')
         cot.observe(d_t, params['oparams'])
     # Check extinction values
     if params['cube_params']['use_extinc'] == True:
@@ -124,15 +124,15 @@ def run_GalCraft(CommandOptions):
     # In case nparticles changed due to the "debug" mode.
     if params['other_params']['mode'] == 'debug':
         nparticles = 500000
-    logger.info('Number of particles = %s or Galaxy Stellar Mass' % nparticles)
+    logging.info('Number of particles = %s or Galaxy Stellar Mass' % nparticles)
     # Calculate mass_cali_factor for flux calibration
     if params['other_params']['gal_mass'] != None:
         mass_cali_factor = params['other_params']['gal_mass'] / nparticles
-        logger.info('Input Galaxy Stellar mass is %s, then the calibration factor is %s.' % (params['other_params']['gal_mass'], mass_cali_factor))
+        logging.info('Input Galaxy Stellar mass is %s, then the calibration factor is %s.' % (params['other_params']['gal_mass'], mass_cali_factor))
     else:
-        logger.info('No flux calibration due to Galaxy Stellar mass is applied.')
+        logging.info('No flux calibration due to Galaxy Stellar mass is applied.')
         mass_cali_factor = 1
-    logger.info('E-Galaxia model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
+    logging.info('E-Galaxia model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
 
 
 
@@ -146,19 +146,19 @@ def run_GalCraft(CommandOptions):
     # - - - - - - - - - - SPATIAL BINNING - - - - - - - - - -
 
     if params['other_params']['mode'] != 'continue':
-        logger.info('Start binning the model...')
+        logging.info('Start binning the model...')
         t = clock()
         d_t_l, statistic_count_l, x_edges_l, y_edges_l = binner.spatial_binner(d_t, params['cube_params'], params['other_params'],
                                                                                ssp_model.age_grid, ssp_model.metal_grid, ssp_model.alpha_grid,
-                                                                               filepath, logger, configDir + setup_cube_name,
+                                                                               filepath, configDir + setup_cube_name,
                                                                                params['oparams']['distance'], nparticles)
-        logger.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
+        logging.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
     else:
-        logger.info('Continue the running from previous run...')
+        logging.info('Continue the running from previous run...')
         t = clock()
         d_t_l, statistic_count_l, x_edges_l, y_edges_l = binner.spatial_binner_continue(params['cube_params'], params['other_params'],
-                                                                                        filepath, logger, configDir + setup_cube_name)
-        logger.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
+                                                                                        filepath, configDir + setup_cube_name)
+        logging.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
     d_t = None
 
 
@@ -176,29 +176,29 @@ def run_GalCraft(CommandOptions):
     # - - - - - - - - - - GENERATE DATACUBE  - - - - - - - - - -
 
         if params['other_params']['mode'] == 'continue' and os.path.exists(filepath + 'data_cube_' + str(cube_idx) + '.fits'):
-            logger.info("Data Cube No.%s exists in %s, will not be run in 'continue' mode" % (cube_idx+1, filepath))
+            logging.info("Data Cube No.%s exists in %s, will not be run in 'continue' mode" % (cube_idx+1, filepath))
             continue
         else:
-            logger.info('Start generating the datacube No.%s...' % (cube_idx+1))
+            logging.info('Start generating the datacube No.%s...' % (cube_idx+1))
             t = clock()
             Spec_DataCube = spec_generator.Spec_Generator(d_t, x_edges, y_edges, statistic_count, ssp_model,
                                                           params['cube_params'], params['ssp_params'], params['other_params'],
-                                                          filepath, logger, cube_idx)
+                                                          filepath, cube_idx)
             Spec_DataCube()
             data_cube = Spec_DataCube.data_cube
             data_cube = data_cube * mass_cali_factor
-            logger.info('Calibrated the flux based on the input Galaxy Stellar Mass=%s.' % params['other_params']['gal_mass'])
+            logging.info('Calibrated the flux based on the input Galaxy Stellar Mass=%s.' % params['other_params']['gal_mass'])
             # Free memory
             Spec_DataCube = None
             d_t = None
             statistic_count = None
-            logger.info('Stellar spectra have been generated, time elapsed: %.2f s' % (clock() - t))
+            logging.info('Stellar spectra have been generated, time elapsed: %.2f s' % (clock() - t))
 
 
     # - - - - - WRITE DATACUBE  - - - - -
 
-        cube_maker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, logger, cube_idx, ssp_model.velscale, __version__)
-        logger.info('Data Cube No.%s has been written in %s, total time elapsed: %.2f s' % (cube_idx+1, filepath , clock() - t))
+        cube_maker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, cube_idx, ssp_model.velscale, __version__)
+        logging.info('Data Cube No.%s has been written in %s, total time elapsed: %.2f s' % (cube_idx+1, filepath , clock() - t))
 
 
 
@@ -211,11 +211,11 @@ def run_GalCraft(CommandOptions):
 
     # - - - - - SAVE CONFIG  - - - - -
 
-    logger.info('Write the json file into the outputs folder.')
+    logging.info('Write the json file into the outputs folder.')
     with open(filepath + 'setup.json', 'w') as f:
         json.dump(params, f, indent=2)
-    logger.info('All the datacubes have been generated successfully, total time elapsed: %.2f s' % (clock() - t_init))
-    logger.info("GalCraft completed successfully.")
+    logging.info('All the datacubes have been generated successfully, total time elapsed: %.2f s' % (clock() - t_init))
+    logging.info("GalCraft completed successfully.")
 
 
 

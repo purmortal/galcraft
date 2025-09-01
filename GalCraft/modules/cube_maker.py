@@ -1,8 +1,9 @@
+import logging
 import numpy as np
 from astropy.io import fits
 
 
-def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, cube_idx, velscale, version):
+def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, cube_idx, velscale, version):
     '''
     Write the final data cube values into a fits file, with proper header information written.
     :param data_cube:
@@ -10,8 +11,7 @@ def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, 
     :param x_edges:
     :param y_edges:
     :param new_wave:
-    :param filepath:
-    :param logger:
+    :param filepath:Z
     :param cube_idx:
     :param velscale:
     :param version:
@@ -27,15 +27,15 @@ def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, 
 
     # add noise on it
     if params['cube_params']['add_noise'] == True:
-        logger.info('Adding noise on the flux with sn = %s' % params['cube_params']['sn'])
+        logging.info('Adding noise on the flux with sn = %s' % params['cube_params']['sn'])
         noise = data_cube / params['cube_params']['sn']
         data_cube_n = np.random.normal(data_cube, noise)
     else:
-        logger.info('No noise was added on the flux')
+        logging.info('No noise was added on the flux')
         data_cube_n = data_cube
 
 
-    logger.info('Writing Headers...')
+    logging.info('Writing Headers...')
     # Write header
     hdr = fits.Header()
     hdr['MODEL'] = params['other_params']['model_name']
@@ -106,7 +106,7 @@ def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, logger, 
     image_hdu3 = fits.ImageHDU(new_wave, name='WAVE')
 
     # Write file
-    logger.info('Combining hduls...')
+    logging.info('Combining hduls...')
     if params['cube_params']['add_noise'] == True:
         hdr2 = hdr1.copy()
         hdr2['EXTNAME'] = 'ERROR'

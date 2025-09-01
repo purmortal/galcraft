@@ -4,6 +4,7 @@ from ..ssp_utils import pegase_util as pegase_lib, \
     conroyinmiles_util as conroyinmiles_lib, \
     xshooter_util as xshooter_lib
 from . import utils
+import logging
 import numpy as np
 from scipy import ndimage
 from multiprocessing import Pool
@@ -17,9 +18,7 @@ def process_Oversampling_templates(star, factor, i, j, k):
 
 class model:
 
-    def __init__(self, templateDir, instrumentDir, ssp_params, other_params, logger):
-
-        self.logger = logger
+    def __init__(self, templateDir, instrumentDir, ssp_params, other_params):
 
         # setup some ssp_params
         self.ssp_name = ssp_params['model']
@@ -199,14 +198,14 @@ class model:
 
         # Setup FWHM_gal, FWHM_tem file and calculate sig
         if type(self.FWHM_gal) == str:
-            self.logger.info('Load the line-spread function %s from the folder ./instrument' % self.FWHM_gal)
+            logging.info('Load the line-spread function %s from the folder ./instrument' % self.FWHM_gal)
             lsf_gal = np.genfromtxt(instrumentDir + self.FWHM_gal)
         else:
             lsf_gal = np.zeros([len(wave), 2])
             lsf_gal[:, 0] = wave
             lsf_gal[:, 1] = self.FWHM_gal
         if type(self.FWHM_tem) == str:
-            self.logger.info('Load the line-spread function %s from the folder ./instrument' % self.FWHM_tem)
+            logging.info('Load the line-spread function %s from the folder ./instrument' % self.FWHM_tem)
             lsf_tem = np.genfromtxt(instrumentDir + self.FWHM_tem)
         else:
             lsf_tem = np.zeros([len(wave), 2])
@@ -219,13 +218,13 @@ class model:
         if np.all(np.isnan(sig)) == True:
             raise ValueError("The outputs FWHM_gal is lower than the SSP FWHM_tem.")
         elif np.any(np.isnan(sig)) == True:
-            logger.info("FWHM_gal is smaller than the SSP FWHM_tem in some wavelength pixels, will remove them and contiue the program...")
+            logging.info("FWHM_gal is smaller than the SSP FWHM_tem in some wavelength pixels, will remove them and contiue the program...")
             mask_nansig = ~np.isnan(sig)
             wave = wave[mask_nansig]
             templates = templates[mask_nansig, :, :]
             sig = sig[mask_nansig]
         else:
-            logger.info("FWHM_gal is larger than the SSP FWHM_tem for all wavelength pixels, continue the program...")
+            logging.info("FWHM_gal is larger than the SSP FWHM_tem for all wavelength pixels, continue the program...")
 
 
         self.templates = templates
@@ -252,28 +251,28 @@ class model:
             self.new_wave = np.arange(wave[0], wave[-1], self.dlam)
 
 
-        logger.info('==================SSP info==================')
-        logger.info('model name:            %s' % self.ssp_name)
-        logger.info('IMF:                   %s' % self.imf)
-        logger.info('isochrone:             %s' % self.isochrone)
-        logger.info('slope:                 %s' % self.slope)
-        logger.info('single_alpha:          %s' % self.single_alpha)
-        logger.info('factor:                %s' % self.factor)
-        logger.info('FWHM_gal:              %s' % self.FWHM_gal)
-        logger.info('FWHM_tem:              %s' % self.FWHM_tem)
-        logger.info('dlam:                  %s' % self.dlam)
-        logger.info('velscale (km/s):       %.2f' % velscale)
-        logger.info('age_range (Gyr):       %s' % [float('{:.3f}'.format(i)) for i in age_grid[[0, -1]]])
-        logger.info('metal_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in metal_grid[[0, -1]]])
-        logger.info('alpha_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
-        logger.info('templates dim:         %s' % list(reg_dim))
-        logger.info('n_templates:           %s' % np.prod(reg_dim))
-        logger.info('SSP wave range:        %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])
+        logging.info('==================SSP info==================')
+        logging.info('model name:            %s' % self.ssp_name)
+        logging.info('IMF:                   %s' % self.imf)
+        logging.info('isochrone:             %s' % self.isochrone)
+        logging.info('slope:                 %s' % self.slope)
+        logging.info('single_alpha:          %s' % self.single_alpha)
+        logging.info('factor:                %s' % self.factor)
+        logging.info('FWHM_gal:              %s' % self.FWHM_gal)
+        logging.info('FWHM_tem:              %s' % self.FWHM_tem)
+        logging.info('dlam:                  %s' % self.dlam)
+        logging.info('velscale (km/s):       %.2f' % velscale)
+        logging.info('age_range (Gyr):       %s' % [float('{:.3f}'.format(i)) for i in age_grid[[0, -1]]])
+        logging.info('metal_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in metal_grid[[0, -1]]])
+        logging.info('alpha_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
+        logging.info('templates dim:         %s' % list(reg_dim))
+        logging.info('n_templates:           %s' % np.prod(reg_dim))
+        logging.info('SSP wave range:        %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])
         if self.wave_range==None:
-            logger.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
+            logging.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
         else:
-            logger.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
-        logger.info('============================================')
+            logging.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
+        logging.info('============================================')
 
 
 

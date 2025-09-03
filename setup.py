@@ -36,7 +36,7 @@ setup(name='GalCraft',
           'ephem',
           'spectres',
       ],
-      python_requires='>=3.6, <=3.12',
+      python_requires='>=3.6, <3.13',
       entry_points={
           'console_scripts': [
               'GalCraft        = GalCraft.MainProcess:main'

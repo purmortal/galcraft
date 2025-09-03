@@ -1,3 +1,8 @@
+1.4.3
+=====
+- Limit numpy to be <2.0 and python<=3.12 given the current ebfpy issue
+
+
 1.4.2
 =====
 - Add a version limit for numpy to be <=2.2.6 given numpy.fromstring is removed since then

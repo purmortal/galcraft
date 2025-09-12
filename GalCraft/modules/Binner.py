@@ -63,7 +63,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
 
-    logging.info('================Cube info=================')
+    logging.info('====================Cube info=====================')
     logging.info('x_coordinate:          %s' % x_coord)
     logging.info('y_coordinate:          %s' % y_coord)
     logging.info('instrument:            %s' % cube_params['instrument'])
@@ -79,7 +79,7 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
     logging.info('use dist? :            %s' % cube_params['use_dist'])
     logging.info('add noise?:            %s' % cube_params['add_noise'])
     logging.info('bootstrapping?:        %s' % cube_params['bootstrap_table'])
-    logging.info('==========================================')
+    logging.info('==================================================')
 
 
     if 'cube_m_h' in d_t.keys() and 'cube_alpha_fe' in d_t.keys() and 'cube_age' in d_t.keys():

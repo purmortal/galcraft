@@ -25,7 +25,7 @@ def age_metal(filename):
     else:
         return None
 
-class xshooter:
+class ssp:
 
     def __init__(self, pathname, FWHM_tem='lsf_xshooter', age_range=None,
                  metal_range=None):

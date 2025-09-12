@@ -34,7 +34,7 @@ def age_metal(filename):
 
 
 
-class miles:
+class ssp:
 
 
     def __init__(self, pathname, FWHM_tem=2.51, age_range=None,

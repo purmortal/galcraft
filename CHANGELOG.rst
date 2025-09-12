@@ -1,3 +1,10 @@
+1.4.4
+=====
+- Add lsf_MUSE-alphaMC
+- Change all the class name in SSP templates reader scripts to be "ssp"
+- Refine the script name of each module
+
+
 1.4.3
 =====
 - Limit numpy to be <2.0 and python<=3.12 given the current ebfpy issue

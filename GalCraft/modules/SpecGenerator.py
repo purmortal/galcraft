@@ -5,7 +5,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import logging
 
 from GalCraft.modules import utils
-from GalCraft.modules.spec_generator_pix import SpecGeneratorPix
+from GalCraft.modules.SpecGeneratorPix import SpecGeneratorPix
 import numpy as np
 import collections
 from multiprocessing import Pool
@@ -155,6 +155,7 @@ class Spec_Generator():
 
                     logging.info('Finish one CPU loop, initialize the input list for another loop.')
                     generator_input = []
+
 
         if len(generator_input) > 0:
             _results = pool.map_async(parallel_specgeneratorpix, generator_input)

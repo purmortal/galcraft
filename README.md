@@ -86,6 +86,6 @@ This software is governed by the MIT License. In brief, you can use, distribute,
 
 
 ## Contact 
-- Zixian Wang (wang.zixian.astro@gmail.com; zixian.wang@utah.edu)
+- Zixian Wang (wang.zixian.astro@gmail.com)
 - Michael Hayden (mrhayden@ou.edu)
 - Sanjib Sharma (ssharma@stsci.edu)

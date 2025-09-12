@@ -13,11 +13,11 @@ import optparse
 from time import perf_counter as clock
 import multiprocessing
 
-import GalCraft.modules.ssp_loader as ssp_loader
-import GalCraft.modules.binner as binner
-import GalCraft.modules.spec_generator as spec_generator
-import GalCraft.modules.cube_maker as cube_maker
-import GalCraft.modules.cot as cot
+import GalCraft.modules.SSPLoader as SSPLoader
+import GalCraft.modules.Binner as Binner
+import GalCraft.modules.SpecGenerator as SpecGenerator
+import GalCraft.modules.CubeMaker as CubeMaker
+import GalCraft.modules.Cot as Cot
 import GalCraft.modules.utils as utils
 from GalCraft._version import __version__
 
@@ -88,7 +88,7 @@ def run_GalCraft(CommandOptions):
 
     logging.info('Loading SSP models...')
     t = clock()
-    ssp_model = ssp_loader.model(templateDir, instrumentDir, params['ssp_params'], params['other_params'])
+    ssp_model = SSPLoader.model(templateDir, instrumentDir, params['ssp_params'], params['other_params'])
     ssp_model.oversample()
     logging.info('SSP model has been successfully loaded, time elapsed: %.2f s' % (clock() - t))
 
@@ -106,7 +106,7 @@ def run_GalCraft(CommandOptions):
             params['oparams'][key] = None
     else:
         logging.info('Specifing the location/rotation of the galaxy')
-        cot.observe(d_t, params['oparams'])
+        Cot.observe(d_t, params['oparams'])
     # Check extinction values
     if params['cube_params']['use_extinc'] == True:
         assert 'exbv' in d_t.keys(), "No extinction in the loaded model, process terminated."
@@ -148,7 +148,7 @@ def run_GalCraft(CommandOptions):
     if params['other_params']['mode'] != 'continue':
         logging.info('Start binning the model...')
         t = clock()
-        d_t_l, statistic_count_l, x_edges_l, y_edges_l = binner.spatial_binner(d_t, params['cube_params'], params['other_params'],
+        d_t_l, statistic_count_l, x_edges_l, y_edges_l = Binner.spatial_binner(d_t, params['cube_params'], params['other_params'],
                                                                                ssp_model.age_grid, ssp_model.metal_grid, ssp_model.alpha_grid,
                                                                                filepath, configDir + setup_cube_name,
                                                                                params['oparams']['distance'], nparticles)
@@ -156,7 +156,7 @@ def run_GalCraft(CommandOptions):
     else:
         logging.info('Continue the running from previous run...')
         t = clock()
-        d_t_l, statistic_count_l, x_edges_l, y_edges_l = binner.spatial_binner_continue(params['cube_params'], params['other_params'],
+        d_t_l, statistic_count_l, x_edges_l, y_edges_l = Binner.spatial_binner_continue(params['cube_params'], params['other_params'],
                                                                                         filepath, configDir + setup_cube_name)
         logging.info('Binning process has been finished, time elapsed: %.2f s' % (clock() - t))
     d_t = None
@@ -181,7 +181,7 @@ def run_GalCraft(CommandOptions):
         else:
             logging.info('Start generating the datacube No.%s...' % (cube_idx+1))
             t = clock()
-            Spec_DataCube = spec_generator.Spec_Generator(d_t, x_edges, y_edges, statistic_count, ssp_model,
+            Spec_DataCube = SpecGenerator.Spec_Generator(d_t, x_edges, y_edges, statistic_count, ssp_model,
                                                           params['cube_params'], params['ssp_params'], params['other_params'],
                                                           filepath, cube_idx)
             Spec_DataCube()
@@ -197,7 +197,7 @@ def run_GalCraft(CommandOptions):
 
     # - - - - - WRITE DATACUBE  - - - - -
 
-        cube_maker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, cube_idx, ssp_model.velscale, __version__)
+        CubeMaker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, cube_idx, ssp_model.velscale, __version__)
         logging.info('Data Cube No.%s has been written in %s, total time elapsed: %.2f s' % (cube_idx+1, filepath , clock() - t))
 
 

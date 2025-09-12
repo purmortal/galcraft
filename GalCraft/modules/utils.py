@@ -263,14 +263,14 @@ def cal_degrade_sig(FWHM_gal, FWHM_tem, dlam):
 
 def degrade_spec_ppxf(spec, spec_err=None, sig=0, gau_npix=None):
     '''
-    Modified from PPXF v8.1.0
+    Modified from PPXF v8.1.0,
+    This function can now skip the err if doesn't have
     :param spec:
     :param spec_err:
     :param sig:
     :param gau_npix:
     :return:
     '''
-    # This function can now skip the err if doesn't have
     if np.all(sig == 0):
         return spec, spec_err
     elif np.isscalar(sig):

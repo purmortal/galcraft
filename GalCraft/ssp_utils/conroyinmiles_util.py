@@ -14,7 +14,7 @@ def age_metal(filename, age_grid, metal_grid):
     return age, metal
 
 
-class conroy:
+class ssp:
     '''
     This is a class which is written for uploading the pegase-hr SSP models.
     The SSP models have been interpolated in a better grid, following the steps

@@ -15,6 +15,9 @@ class model:
 
         # setup some ssp_params
         self.ssp_name = ssp_params['model']
+        self.imf = ssp_params['imf']
+        self.slope = ssp_params['slope']
+        self.isochrone = ssp_params['isochrone']
         self.single_alpha = ssp_params['single_alpha']
         self.factor = ssp_params['factor']
         self.FWHM_gal = ssp_params['FWHM_gal']

@@ -247,7 +247,7 @@ def plot_parameter_maps(mass_fraction_pixel_bin, age_grid_2d, metal_grid_2d, alp
 
 
 ##################################################################################
-# Spectral Degrading functions
+# Spectral functions
 
 
 def cal_degrade_sig(FWHM_gal, FWHM_tem, dlam):
@@ -304,6 +304,45 @@ def degrade_spec_ppxf(spec, spec_err=None, sig=0, gau_npix=None):
 
     return conv_spectrum, conv_spectrum_err
 
+
+def log_rebin(lamRange, spec, oversample=1, velscale=None, flux=False):
+    '''
+    This function is taken from ppxf v7.4.5
+    '''
+    lamRange = np.asarray(lamRange)
+    assert len(lamRange) == 2, 'lamRange must contain two elements'
+    assert lamRange[0] < lamRange[1], 'It must be lamRange[0] < lamRange[1]'
+    assert spec.ndim == 1 or spec.ndim == 2, 'input spectrum must be a vector or 2d array'
+    n = spec.shape[0]
+    m = int(n*oversample)
+
+    dLam = np.diff(lamRange)/(n - 1.)        # Assume constant dLam
+    lim = lamRange/dLam + [-0.5, 0.5]        # All in units of dLam
+    borders = np.linspace(*lim, num=n+1)     # Linearly
+    logLim = np.log(lim)
+
+    c = 299792.458                           # Speed of light in km/s
+    if velscale is None:                     # Velocity scale is set by user
+        velscale = c*np.diff(logLim)/m       # Only for output (eq. 8 of Cappellari 2017, MNRAS)
+    else:
+        logScale = velscale/c
+        m = int(np.diff(logLim)/logScale)    # Number of output pixels
+        logLim[1] = logLim[0] + m*logScale
+
+    newBorders = np.exp(np.linspace(*logLim, num=m+1)) # Logarithmically
+    k = (newBorders - lim[0]).clip(0, n-1).astype(int)
+
+    specNew = np.add.reduceat(spec, k)[:-1]     # Do analytic integral
+    specNew = (specNew.T*(np.diff(k) > 0)).T    # fix for design flaw of reduceat()
+    specNew += np.diff(spec[k].T*(newBorders - borders[k])).T
+
+    if not flux:
+        specNew = (specNew.T/np.diff(newBorders)).T
+
+    # Output log(wavelength): natural log of geometric mean
+    logLam = np.log(np.sqrt(newBorders[1:]*newBorders[:-1])*dLam)
+
+    return specNew, logLam, velscale
 
 
 def process_degrade_cube(spec, spec_err, i, j, sigma, gau_npix=None):

@@ -1,3 +1,7 @@
+1.4.5
+=====
+- Add function process_DegradingLogRebinning_templates and degrade_logrebin which is for estimating the true answer of GIST results
+
 1.4.4
 =====
 - Add lsf_MUSE-alphaMC

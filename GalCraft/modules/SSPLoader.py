@@ -4,7 +4,6 @@ import logging
 import numpy as np
 import importlib.util
 from scipy import ndimage
-from ppxf.ppxf_util import log_rebin
 from spectres import spectres
 
 from multiprocessing import Pool
@@ -362,5 +361,5 @@ def process_DegradingLogRebinning_templates(starNew, wave, wave_oversampled, sig
     starNew = utils.degrade_spec_ppxf(starNew, None, sig, gau_npix=None)[0]  # Degrading the oversampled spectra
     star = spectres(wave, wave_oversampled, starNew, fill=np.nan, verbose=False)  # The rebin is needed because the spectra is also rebinned
     star = star[idx_lam]
-    starLogRebin, logLam, _ = log_rebin(lamRange_spmod, star, velscale=velscale)
+    starLogRebin, logLam, _ = utils.log_rebin(lamRange_spmod, star, velscale=velscale)
     return starLogRebin, logLam, i, j, k

@@ -4,4 +4,4 @@
 # Second digit: minor features / modifications
 # Third digit: bug fixing
 
-__version__ = "1.4.4"
+__version__ = "1.4.5"

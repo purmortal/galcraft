@@ -114,7 +114,7 @@ class Spec_Generator():
                                                  use_losvd=self.cube_params['use_losvd'],
                                                  use_extinc=self.cube_params['use_extinc'],
                                                  extinc_factor=self.cube_params['extinc_factor'],
-                                                 single_alpha=self.ssp_params['single_alpha'],
+                                                 single_alpha=self.ssp_model.single_alpha,
                                                  templatesOversampled_shape=self.ssp_model.templatesOversampled.shape,
                                                  new_wave=self.ssp_model.new_wave,
                                                  wave_oversampled=self.ssp_model.wave_oversampled,

@@ -1,27 +1,14 @@
-from ..ssp_utils import pegase_util as pegase_lib, \
-    miles_util as miles_lib, \
-    pegase_interp_util as pegase_interp_lib, \
-    conroyinmiles_util as conroyinmiles_lib, \
-    xshooter_util as xshooter_lib
-from . import utils
+
+import os
 import logging
 import numpy as np
+import importlib.util
 from scipy import ndimage
 from spectres import spectres
+
 from multiprocessing import Pool
-
-
-
-def process_Oversampling_templates(star, factor, i, j, k):
-    starNew = ndimage.interpolation.zoom(star, factor, order=3)  # Oversampling
-    return starNew, i, j, k
-
-def process_DegradingLogRebinning_templates(starNew, wave, wave_oversampled, sig, velscale, idx_lam, lamRange_spmod, i, j, k):
-    starNew = utils.degrade_spec_ppxf(starNew, None, sig, gau_npix=None)[0]  # Degrading the oversampled spectra
-    star = spectres(wave, wave_oversampled, starNew, fill=np.nan, verbose=False)  # The rebin is needed because the spectra is also rebinned
-    star = star[idx_lam]
-    starLogRebin, logLam, _ = utils.log_rebin(lamRange_spmod, star, velscale=velscale)
-    return starLogRebin, logLam, i, j, k
+import GalCraft.modules.utils as utils
+from GalCraft.modules.constant import *
 
 
 class model:
@@ -30,154 +17,36 @@ class model:
 
         # setup some ssp_params
         self.ssp_name = ssp_params['model']
-        self.imf = ssp_params['imf']
-        self.slope = ssp_params['slope']
-        self.isochrone = ssp_params['isochrone']
-        self.single_alpha = ssp_params['single_alpha']
+        self.library = ssp_params['library']
         self.factor = ssp_params['factor']
         self.FWHM_gal = ssp_params['FWHM_gal']
         self.FWHM_tem = ssp_params['FWHM_tem']
         self.dlam = ssp_params['dlam']
         self.age_range = ssp_params['age_range']
         self.metal_range = ssp_params['metal_range']
+        self.alpha_range = ssp_params['alpha_range']
         self.wave_range = ssp_params['wave_range']
         self.interpolator_method = ssp_params['spec_interpolator']
         self.ncpu = other_params['ncpu']
 
 
-        models = []
+        # Load SSP models
+        model = self.load_ssp(templateDir=templateDir)
+        templates = model.templates
 
-        if self.ssp_name=='miles':
-
-            if self.single_alpha == False:
-                models.append(miles_lib.ssp(templateDir + 'miles/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.00/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          age_range=self.age_range, metal_range=self.metal_range))
-                models.append(miles_lib.ssp(templateDir + 'miles/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.40/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          age_range=self.age_range, metal_range=self.metal_range))
-                alpha_grid = np.array([0, 0.4])
-
-            elif self.single_alpha == 'alpha0':
-                models.append(miles_lib.ssp(templateDir + 'miles/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.00/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-            else:
-                models.append(miles_lib.ssp(templateDir + 'miles/' + 'MILES_' + self.isochrone + '_' + self.imf + '_baseFe/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        if self.ssp_name=='miles_interp':
-
-            if self.single_alpha == False:
-                models.append(miles_lib.ssp(templateDir + 'miles_interp/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.00/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          age_range=self.age_range, metal_range=self.metal_range))
-                models.append(miles_lib.ssp(templateDir + 'miles_interp/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.40/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          age_range=self.age_range, metal_range=self.metal_range))
-                alpha_grid = np.array([0, 0.4])
-
-            elif self.single_alpha == 'alpha0':
-                models.append(miles_lib.ssp(templateDir + 'miles/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.00/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-            else:
-                models.append(miles_lib.ssp(templateDir + 'miles_interp/' + 'MILES_' + self.isochrone + '_' + self.imf + '_baseFe/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        if self.ssp_name=='miles_loginterp':
-
-            if self.single_alpha == False:
-                models.append(miles_lib.ssp(templateDir + 'miles_loginterp/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.00/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          age_range=self.age_range, metal_range=self.metal_range))
-                models.append(miles_lib.ssp(templateDir + 'miles_loginterp/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.40/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          age_range=self.age_range, metal_range=self.metal_range))
-                alpha_grid = np.array([0, 0.4])
-
-            elif self.single_alpha == 'alpha0':
-                models.append(miles_lib.ssp(templateDir + 'miles/' + 'MILES_' + self.isochrone + '_' + self.imf + '_Ep0.00/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-            else:
-                models.append(miles_lib.ssp(templateDir + 'miles_loginterp/' + 'MILES_' + self.isochrone + '_' + self.imf + '_baseFe/M' + self.imf.lower() + '%.2f' % self.slope + '*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-
-        elif self.ssp_name == 'pegasehr_interp':
-
-            assert self.single_alpha == True, "No alpha-enhanced model avaliable for PEGASE-HR yet."
-            models.append(pegase_interp_lib.ssp(templateDir + 'pegasehr/' + 'PEGASEHR_' + self.isochrone + '_' + self.imf + '_baseFe/',
-                                FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        elif self.ssp_name == 'pegasehr':
-
-            assert self.single_alpha == True, "No alpha-enhanced model avaliable for PEGASE-HR yet."
-            models.append(pegase_lib.ssp(templateDir + 'pegasehr/' + 'PEGASEHR_' + self.isochrone + '_' + self.imf + '_baseFe/',
-                                            FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-
-        elif self.ssp_name == 'conroyinmiles':
-
-            if self.single_alpha == False:
-                alpha_grid = np.load(templateDir + 'conroy/ssp_mist_v2.3_milesResUnit/' + 'miles/' + 'alpha_grid.npy')
-                for alpha_i in range(len(alpha_grid)):
-                    models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesResUnit/' + 'miles/' + 'alpha_%s/' % int(alpha_i),
-                                                           FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-            else:
-                # Just load alpha/fe=0.0 dex templates
-                models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesResUnit/' + 'miles/' + 'alpha_0/',
-                                                       FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        elif self.ssp_name == 'conroyinmiles_moremetalalpha':
-
-            if self.single_alpha == False:
-                alpha_grid = np.load(templateDir + 'conroy/ssp_mist_v2.3_milesResUnit_moremetalalpha/' + 'alpha_grid.npy')
-                for alpha_i in range(len(alpha_grid)):
-                    models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesResUnit_moremetalalpha/' + 'alpha_%s/' % int(alpha_i),
-                                                           FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-            else:
-                # Just load alpha/fe=0.0 dex templates
-                models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesResUnit_moremetalalpha/' + 'alpha_0/',
-                                                       FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        elif self.ssp_name == 'conroyinmilesCaT':
-
-            if self.single_alpha == False:
-                alpha_grid = np.load(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit/' + 'alpha_grid.npy')
-                for alpha_i in range(len(alpha_grid)):
-                    models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit/' + 'alpha_%s/' % int(alpha_i),
-                                                           FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-            else:
-                # Just load alpha/fe=0.0 dex templates
-                models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit/' + 'alpha_0/',
-                                                       FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        elif self.ssp_name == 'conroyinmilesCaT_moremetalalpha':
-
-            if self.single_alpha == False:
-                alpha_grid = np.load(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit_moremetalalpha/' + 'alpha_grid.npy')
-                for alpha_i in range(len(alpha_grid)):
-                    models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit_moremetalalpha/' + 'alpha_%s/' % int(alpha_i),
-                                                           FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-            else:
-                # Just load alpha/fe=0.0 dex templates
-                models.append(conroyinmiles_lib.ssp(templateDir + 'conroy/ssp_mist_v2.3_milesconroyCaTResUnit_moremetalalpha/' + 'alpha_0/',
-                                                       FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        elif self.ssp_name == 'xshooter':
-            assert self.single_alpha == True, "No alpha-enhanced model avaliable for X-shooter yet."
-            models.append(xshooter_lib.ssp(templateDir + 'xshooter/' + 'XSHOOTER_' + self.isochrone + '_' + self.imf + '_baseFe/XSL_SSP_*.fits',
-                                          FWHM_tem=self.FWHM_tem, age_range=self.age_range, metal_range=self.metal_range))
-
-        templates = np.stack([model.templates for model in models], axis=3)
 
         # Define some constants from SSP parameters
         reg_dim = templates.shape[1:]
-        c = 299792.458 # speed of light in km/s
-        wave = models[0].lam_temp
-        velscale = c * np.log(wave[1]/wave[0])
-        age_grid = models[0].age_grid[:, 0]
-        metal_grid = models[0].metal_grid[0, :]
-        age_grid_2d = models[0].age_grid
-        metal_grid_2d = models[0].metal_grid
+        wave = model.lam_temp
+        velscale = cvel * np.log(wave[1]/wave[0])
+        age_grid = model.age_grid[:, 0, 0]
+        metal_grid = model.metal_grid[0, :, 0]
+        alpha_grid = model.alpha_grid[0, 0, :]
+        age_grid_3d = model.age_grid
+        metal_grid_3d = model.metal_grid
+        alpha_grid_3d = model.alpha_grid
 
-        self.FWHM_tem = models[0].FWHM_tem
+        self.FWHM_tem = model.FWHM_tem
 
 
         # This is for calculating the bins in age, metallicity
@@ -189,19 +58,17 @@ class model:
         yb = (y[1:] + y[:-1])/2
         xb = np.hstack([1.5*x[0] - x[1]/2, xb, 1.5*x[-1] - x[-2]/2])  # 1st/last border
         yb = np.hstack([1.5*y[0] - y[1]/2, yb, 1.5*y[-1] - y[-2]/2])
-
-
-        if self.single_alpha == False:
+        if len(alpha_grid) > 1:
+            self.single_alpha = False
             zgrid = alpha_grid
             z = zgrid
             zb = (z[1:] + z[:-1])/2
             zb = np.hstack([1.5*z[0] - z[1]/2, zb, 1.5*z[-1] - z[-2]/2])
         else:
             # This will be used when generating the interpolator,
-            # if single_alpha==False, it will be still fine to get a 3D data
-            alpha_grid = np.array([0])
+            # if len(alpha_grid) == 1, it will be still fine to get a 3D data
+            self.single_alpha = True
             zb = np.array([0])
-
 
 
         # Setup FWHM_gal, FWHM_tem file and calculate sig
@@ -243,14 +110,18 @@ class model:
         self.logage_grid = np.log10(age_grid) + 9
         self.metal_grid = metal_grid
         self.alpha_grid = alpha_grid
-        self.age_grid_2d = age_grid_2d
-        self.metal_grid_2d = metal_grid_2d
+        self.age_grid_3d = age_grid_3d
+        self.metal_grid_3d = metal_grid_3d
+        self.alpha_grid_3d = alpha_grid_3d
+        self.age_grid_2d = age_grid_3d[:, :, 0]
+        self.metal_grid_2d = metal_grid_3d[:, :, 0]
         self.xb = xb
         self.yb = yb
         self.zb = zb
         self.lsf_gal = lsf_gal
         self.lsf_tem = lsf_tem
         self.sig = sig
+        # self.templates_org = model.templates
 
         # Add the new wave
         if self.dlam == None:
@@ -259,35 +130,31 @@ class model:
             self.new_wave = np.arange(wave[0], wave[-1], self.dlam)
 
 
-        logging.info('==================SSP info==================')
-        logging.info('model name:            %s' % self.ssp_name)
-        logging.info('IMF:                   %s' % self.imf)
-        logging.info('isochrone:             %s' % self.isochrone)
-        logging.info('slope:                 %s' % self.slope)
-        logging.info('single_alpha:          %s' % self.single_alpha)
-        logging.info('factor:                %s' % self.factor)
-        logging.info('FWHM_gal:              %s' % self.FWHM_gal)
-        logging.info('FWHM_tem:              %s' % self.FWHM_tem)
-        logging.info('dlam:                  %s' % self.dlam)
-        logging.info('velscale (km/s):       %.2f' % velscale)
-        logging.info('age_range (Gyr):       %s' % [float('{:.3f}'.format(i)) for i in age_grid[[0, -1]]])
-        logging.info('metal_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in metal_grid[[0, -1]]])
-        logging.info('alpha_range (dex):     %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
-        logging.info('templates dim:         %s' % list(reg_dim))
-        logging.info('n_templates:           %s' % np.prod(reg_dim))
-        logging.info('SSP wave range:        %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])
+        logging.info('======================SSP info======================')
+        logging.info('SSP name:                 %s' % self.ssp_name)
+        logging.info('library:                  %s' % self.library)
+        logging.info('oversample factor:        %s' % self.factor)
+        logging.info('FWHM_gal:                 %s' % self.FWHM_gal)
+        logging.info('FWHM_tem:                 %s' % self.FWHM_tem)
+        logging.info('wave interval (0.1nm):    %s' % self.dlam)
+        logging.info('velscale (km/s):          %.2f' % velscale)
+        logging.info('age_range (Gyr):          %s' % [float('{:.3f}'.format(i)) for i in age_grid[[0, -1]]])
+        logging.info('metal_range (dex):        %s' % [float('{:.3f}'.format(i)) for i in metal_grid[[0, -1]]])
+        logging.info('alpha_range (dex):        %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
+        logging.info('single_alpha?:            %s' % self.single_alpha)
+        logging.info('templates dim:            %s' % list(reg_dim))
+        logging.info('n_templates:              %s' % np.prod(reg_dim))
+        logging.info('SSP wave range:           %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])
         if self.wave_range==None:
-            logging.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
+            logging.info('Cube wave range:          %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
         else:
-            logging.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
-        logging.info('============================================')
-
-
-
+            logging.info('Cube wave range:          %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
+        logging.info('====================================================')
 
 
 
     def oversample(self):
+
         # Oversample the templates and integral the spectra again
         wave_oversampled = ndimage.interpolation.zoom(self.wave, self.factor, order=1)
         templatesOversampled = np.zeros([self.templates.shape[0]*self.factor] + list(self.templates.shape[1:]))
@@ -297,7 +164,6 @@ class model:
         sig_oversampled = utils.cal_degrade_sig(np.interp(wave_oversampled, self.lsf_gal[:, 0], self.lsf_gal[:, 1]),
                                                 np.interp(wave_oversampled, self.lsf_tem[:, 0], self.lsf_tem[:, 1]),
                                                 np.diff(wave_oversampled)[0])
-
 
         pool = Pool(processes=self.ncpu)
         results = []
@@ -317,6 +183,22 @@ class model:
         self.sig_oversampled = sig_oversampled
 
         self.templatesTransposed = np.transpose(self.templatesOversampled, (1, 2, 3, 0))
+
+
+
+
+    def load_ssp(self, templateDir):
+
+        logging.info("Using the routine for '"+self.ssp_name+"_util.py'")
+        spec = importlib.util.spec_from_file_location("", os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/ssp_utils/"+self.ssp_name+"_util.py")
+        SSPLoaderModule = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(SSPLoaderModule)
+
+        model = SSPLoaderModule.ssp(os.path.join(templateDir, self.library), FWHM_tem=self.FWHM_tem,
+                                    age_range=self.age_range, metal_range=self.metal_range, alpha_range=self.alpha_range)
+
+        return model
+
 
     def degrade_logrebin(self, velscale, lmin, lmax):
 
@@ -357,3 +239,16 @@ class model:
 
         self.templatesOversampledDegradedLogRebinned = templatesOversampledDegradedLogRebinned / np.mean(templatesOversampledDegradedLogRebinned)
         self.logLam = logLam
+
+
+def process_Oversampling_templates(star, factor, i, j, k):
+    starNew = ndimage.interpolation.zoom(star, factor, order=3)  # Oversampling
+    return starNew, i, j, k
+
+
+def process_DegradingLogRebinning_templates(starNew, wave, wave_oversampled, sig, velscale, idx_lam, lamRange_spmod, i, j, k):
+    starNew = utils.degrade_spec_ppxf(starNew, None, sig, gau_npix=None)[0]  # Degrading the oversampled spectra
+    star = spectres(wave, wave_oversampled, starNew, fill=np.nan, verbose=False)  # The rebin is needed because the spectra is also rebinned
+    star = star[idx_lam]
+    starLogRebin, logLam, _ = utils.log_rebin(lamRange_spmod, star, velscale=velscale)
+    return starLogRebin, logLam, i, j, k

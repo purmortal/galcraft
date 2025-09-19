@@ -9,6 +9,7 @@ from scipy.stats import binned_statistic_2d
 
 import matplotlib.colors as colors
 from matplotlib import pyplot as plt
+from GalCraft.modules.constant import *
 
 
 def setupLogfile(logfile, __version__, mode='a', welcome=True):
@@ -76,8 +77,7 @@ def doppler_shift(wavelength, flux, dv):
     only care about accuracy to the level of a few tenths of a km/s. If you care
     about better accuracy, you can do better with spline interpolation.
     '''
-    c = 2.99792458e5 # km/s
-    doppler_factor = np.sqrt((1 - dv/c)/(1 + dv/c))
+    doppler_factor = np.sqrt((1 - dv/cvel)/(1 + dv/cvel))
     new_wavelength = wavelength * doppler_factor
     new_flux = np.interp(new_wavelength, wavelength, flux)
     return new_flux
@@ -321,11 +321,10 @@ def log_rebin(lamRange, spec, oversample=1, velscale=None, flux=False):
     borders = np.linspace(*lim, num=n+1)     # Linearly
     logLim = np.log(lim)
 
-    c = 299792.458                           # Speed of light in km/s
     if velscale is None:                     # Velocity scale is set by user
-        velscale = c*np.diff(logLim)/m       # Only for output (eq. 8 of Cappellari 2017, MNRAS)
+        velscale = cvel*np.diff(logLim)/m       # Only for output (eq. 8 of Cappellari 2017, MNRAS)
     else:
-        logScale = velscale/c
+        logScale = velscale/cvel
         m = int(np.diff(logLim)/logScale)    # Number of output pixels
         logLim[1] = logLim[0] + m*logScale
 

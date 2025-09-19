@@ -60,10 +60,7 @@ def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, cube_idx
     hdr['VERSION'] = version
 
     hdr['SSP'] = params['ssp_params']['model']
-    hdr['ISOCHRON'] = params['ssp_params']['isochrone']
-    hdr['IMF'] = params['ssp_params']['imf']
-    hdr['SLOPE'] = params['ssp_params']['slope']
-    hdr['NOALPHA'] = params['ssp_params']['single_alpha']
+    hdr['LIBRARY'] = params['ssp_params']['library']
     hdr['FWHMGAL'] = params['ssp_params']['FWHM_gal']
     hdr['INTERP'] = params['ssp_params']['spec_interpolator']
 

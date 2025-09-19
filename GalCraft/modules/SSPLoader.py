@@ -132,7 +132,7 @@ class model:
 
         logging.info('======================SSP info======================')
         logging.info('SSP name:                 %s' % self.ssp_name)
-        logging.info('single_alpha:             %s' % self.single_alpha)
+        logging.info('library:                  %s' % self.library)
         logging.info('oversample factor:        %s' % self.factor)
         logging.info('FWHM_gal:                 %s' % self.FWHM_gal)
         logging.info('FWHM_tem:                 %s' % self.FWHM_tem)
@@ -141,13 +141,14 @@ class model:
         logging.info('age_range (Gyr):          %s' % [float('{:.3f}'.format(i)) for i in age_grid[[0, -1]]])
         logging.info('metal_range (dex):        %s' % [float('{:.3f}'.format(i)) for i in metal_grid[[0, -1]]])
         logging.info('alpha_range (dex):        %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
+        logging.info('single_alpha?:             %s' % self.single_alpha)
         logging.info('templates dim:            %s' % list(reg_dim))
         logging.info('n_templates:              %s' % np.prod(reg_dim))
         logging.info('SSP wave range:           %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])
         if self.wave_range==None:
-            logging.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
+            logging.info('Cube wave range:          %s' % [float('{:.3f}'.format(i)) for i in [self.new_wave[0], self.new_wave[-1]]])
         else:
-            logging.info('Cube wave range:       %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
+            logging.info('Cube wave range:          %s' % [float('{:.3f}'.format(i)) for i in self.wave_range])
         logging.info('====================================================')
 
 
@@ -189,7 +190,7 @@ class model:
     def load_ssp(self, templateDir):
 
         logging.info("Using the routine for '"+self.ssp_name+"_util.py'")
-        spec = importlib.util.spec_from_file_location("", os.path.dirname(os.path.realpath(__file__))+"/ssp_utils/"+self.ssp_name+"_util.py")
+        spec = importlib.util.spec_from_file_location("", os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/ssp_utils/"+self.ssp_name+"_util.py")
         SSPLoaderModule = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(SSPLoaderModule)
 

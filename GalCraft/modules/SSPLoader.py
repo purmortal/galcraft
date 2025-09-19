@@ -141,7 +141,7 @@ class model:
         logging.info('age_range (Gyr):          %s' % [float('{:.3f}'.format(i)) for i in age_grid[[0, -1]]])
         logging.info('metal_range (dex):        %s' % [float('{:.3f}'.format(i)) for i in metal_grid[[0, -1]]])
         logging.info('alpha_range (dex):        %s' % [float('{:.3f}'.format(i)) for i in alpha_grid[[0, -1]]])
-        logging.info('single_alpha?:             %s' % self.single_alpha)
+        logging.info('single_alpha?:            %s' % self.single_alpha)
         logging.info('templates dim:            %s' % list(reg_dim))
         logging.info('n_templates:              %s' % np.prod(reg_dim))
         logging.info('SSP wave range:           %s' % [float('{:.3f}'.format(i)) for i in [self.wave[0], self.wave[-1]]])

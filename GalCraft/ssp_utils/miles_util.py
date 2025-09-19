@@ -5,31 +5,74 @@ from astropy.io import fits
 
 
 
-def age_metal(filename):
+def age_metal_alpha(passedFiles):
     """
-    Extract the age and metallicity from the name of a file of
-    the MILES library of Single Stellar Population models as
-    downloaded from http://miles.iac.es/ as of 2022
-
-    This function relies on the MILES file containing a substring of the
-    precise form like Zm0.40T00.0794, specifying the metallicity and age.
-
-    :param filename: string possibly including full path
-        (e.g. 'miles_library/Eun1.30Zm0.40T00.0794.fits')
-    :return: age (Gyr), [M/H]
-
+    Function to extract the values of age, metallicity, and alpha-enhancement
+    from standard MILES filenames. Note that this function can automatically
+    distinguish between template libraries that do or do not include
+    alpha-enhancement.
     """
-    # s = re.findall(r'Z[m|p][0-9]\.[0-9]{2}T[0-9]{2}\.[0-9]{4}', filename)[0]
-    s = re.findall(r'Z[m|p]\d+\.\d+T\d+\.\d+', filename)[0]
-    split_result = s.split("T")
-    metal = split_result[0]
-    age = float(split_result[1])
-    if "Zm" in metal:
-        metal = -float(metal[2:])
-    elif "Zp" in metal:
-        metal = float(metal[2:])
 
-    return age, metal
+    out = np.zeros((len(passedFiles),3)); out[:,:] = np.nan
+
+    files = []
+    for i in range( len(passedFiles) ):
+        files.append( passedFiles[i].split('/')[-1] )
+
+    for num, s in enumerate(files):
+        selected_s = re.findall(r'Z[m|p]\d+\.\d+T\d+\.\d+', s)[0]
+        split_result = selected_s.split("T")
+        age = float(split_result[1])
+        s_metal = split_result[0]
+        if "Zm" in s_metal:
+            metal = -float(s_metal[2:])
+        elif "Zp" in s_metal:
+            metal = float(s_metal[2:])
+        else:
+            raise ValueError("             This is not a standard MILES filename")
+
+        # Alpha
+        if s.find('baseFe') == -1:
+            EMILES = False
+        elif s.find('baseFe') != -1:
+            EMILES = True
+
+        if EMILES == False:
+            # Usage of MILES: There is a alpha defined
+            e = s.find('E')
+            alpha = float( s[e+2 : e+6] )
+        elif EMILES == True:
+            # Usage of EMILES: There is *NO* alpha defined
+            alpha = 0.0
+
+        out[num,:] = age, metal, alpha
+
+    Age   = np.unique( out[:,0] )
+    Metal = np.unique( out[:,1] )
+    Alpha = np.unique( out[:,2] )
+    nAges  = len(Age)
+    nMetal = len(Metal)
+    nAlpha = len(Alpha)
+
+    float_metal_str = '{:.' + str(len(s_metal[2:])-2) + 'f}'
+    metal_str = []
+    alpha_str = []
+    for i in range( len(Metal) ):
+        if Metal[i] > 0:
+            mm = 'p'+float_metal_str.format(np.abs(Metal[i]))+'T'
+        elif Metal[i] < 0:
+            mm = 'm'+float_metal_str.format(np.abs(Metal[i]))+'T'
+        metal_str.append(mm)
+    for i in range( len(Alpha) ):
+        if EMILES == False:
+            alpha_str.append( 'Ep'+'{:.2f}'.format(Alpha[i]) )
+        elif EMILES == True:
+            alpha_str = ['baseFe']
+
+    if 'loginterp' in passedFiles[0]:
+        Age = 10 ** (Age - 9)
+
+    return( Age, Metal, Alpha, metal_str, alpha_str, nAges, nMetal, nAlpha )
 
 
 
@@ -37,102 +80,74 @@ def age_metal(filename):
 class ssp:
 
 
-    def __init__(self, pathname, FWHM_tem=2.51, age_range=None,
-                 metal_range=None):
+    def __init__(self, path_library, FWHM_tem=2.51,
+                 age_range=None, metal_range=None, alpha_range=None):
 
-        files = glob.glob(pathname)
-        assert len(files) > 0, "Files not found %s" % pathname
+        sp_models = glob.glob(path_library)
+        assert len(sp_models) > 0, "Files not found %s" % path_library
+        sp_models.sort()
 
-        all = [age_metal(f) for f in files]
-        all_ages, all_metals = np.array(all).T
-        ages, metals = np.unique(all_ages), np.unique(all_metals)
-        n_ages, n_metal = len(ages), len(metals)
+        # Read data
+        hdu_spmod      = fits.open(sp_models[0])
+        ssp_data       = hdu_spmod[0].data
+        ssp_head       = hdu_spmod[0].header
+        lam            = ssp_head['CRVAL1'] + np.arange(ssp_head['NAXIS1']) * ssp_head['CDELT1']
 
-        assert set(all) == set([(a, b) for a in ages for b in metals]), \
-            'Ages and Metals do not form a Cartesian grid'
+        # Extract ages, metallicities and alpha from the templates
+        ages, metals, alphas, metal_str, alpha_str, nAges, nMetal, nAlpha = age_metal_alpha(sp_models) # revised by Zixian Wang
 
-        # Extract the wavelength range and logarithmically rebin one spectrum
-        # to the same velocity scale of the galaxy spectrum, to determine the
-        # size needed for the array which will contain the template spectra.
-        hdu = fits.open(files[0])
-        ssp = hdu[0].data
-        h2 = hdu[0].header
-        lam = h2['CRVAL1'] + np.arange(h2['NAXIS1']) * h2['CDELT1']
-        # lam_range_temp = lam[[0, -1]]
-        # ssp_new, ln_lam_temp = util.log_rebin(lam_range_temp, ssp, velscale=velscale)[:2]
-        # ssp_new = ssp
+        # Arrays to store templates
+        templates          = np.zeros((ssp_data.size, nAges, nMetal, nAlpha))
+        templates[:,:,:,:] = np.nan
 
-        # if norm_range is not None:
-        #     norm_range = np.log(norm_range)
-        #     band = (norm_range[0] <= lam) & (lam <= norm_range[1])
+        # Arrays to store properties of the models
+        age_grid    = np.empty((nAges, nMetal, nAlpha))
+        metal_grid  = np.empty((nAges, nMetal, nAlpha))
+        alpha_grid  = np.empty((nAges, nMetal, nAlpha))
 
-        templates = np.empty((ssp.size, n_ages, n_metal))
-        age_grid, metal_grid, flux = np.empty((3, n_ages, n_metal))
-
-        # Convolve the whole Vazdekis library of spectral templates
-        # with the quadratic difference between the galaxy and the
-        # Vazdekis instrumental resolution. Logarithmically rebin
-        # and store each template as a column in the array TEMPLATES.
-
-        # Quadratic sigma difference in pixels Vazdekis --> galaxy
-        # The formula below is rigorously valid if the shapes of the
-        # instrumental spectral profiles are well approximated by Gaussians.
-        # if FWHM_gal is not None:
-        #     FWHM_dif = np.sqrt(FWHM_gal ** 2 - FWHM_tem ** 2)
-        #     sigma = FWHM_dif / 2.355 / h2['CDELT1']  # Sigma difference in pixels
-
-        # Here we make sure the spectra are sorted in both [M/H] and Age
-        # along the two axes of the rectangular grid of templates.
-        for j, age in enumerate(ages):
-            for k, met in enumerate(metals):
-                p = all.index((age, met))
-                hdu = fits.open(files[p])
-                ssp = hdu[0].data
-                # if FWHM_gal is not None:
-                #     if np.isscalar(FWHM_gal):
-                #         if sigma > 0.1:  # Skip convolution for nearly zero sigma
-                #             ssp = ndimage.gaussian_filter1d(ssp, sigma)
-                #     else:
-                #         ssp = util.gaussian_filter1d(ssp, sigma)  # convolution with variable sigma
-                # ssp_new = util.log_rebin(lam_range_temp, ssp, velscale=velscale)[0]
-                # ssp_new = ssp
-                # if norm_range is not None:
-                #     flux[j, k] = np.mean(ssp_new[band])
-                #     ssp_new /= flux[j, k]  # Normalize every spectrum
-                templates[:, j, k] = ssp
-                age_grid[j, k] = age
-                metal_grid[j, k] = met
+        for i, age in enumerate(alpha_str):
+            # This sorts for metals
+            for k, mh in enumerate(metal_str):
+                files = [s for s in sp_models if (mh in s and age in s)]
+                # This sorts for ages
+                for j, filename in enumerate(files):
+                    hdu = fits.open(filename)
+                    ssp = hdu[0].data
+                    age_grid[j, k, i]    = ages[j]
+                    metal_grid[j, k, i]  = metals[k]
+                    alpha_grid[j, k, i]  = alphas[i]
+                    templates[:, j, k, i] = ssp
 
         if age_range is not None:
-            w = (age_range[0] <= age_grid[:, 0]) & (age_grid[:, 0] <= age_range[1])
-            templates = templates[:, w, :]
-            age_grid = age_grid[w, :]
-            metal_grid = metal_grid[w, :]
-            flux = flux[w, :]
-            n_ages, n_metal = age_grid.shape
+            w = (age_range[0] <= age_grid[:, 0, 0]) & (age_grid[:, 0, 0] <= age_range[1])
+            templates = templates[:, w, :, :]
+            age_grid = age_grid[w, :, :]
+            metal_grid = metal_grid[w, :, :]
+            alpha_grid = alpha_grid[w, :, :]
+            nAges, nMetal, nAlpha = age_grid.shape
 
         if metal_range is not None:
-            w = (metal_range[0] <= metal_grid[0, :]) & (metal_grid[0, :] <= metal_range[1])
-            templates = templates[:, :, w]
-            age_grid = age_grid[:, w]
-            metal_grid = metal_grid[:, w]
-            flux = flux[:, w]
-            n_ages, n_metal = age_grid.shape
+            w = (metal_range[0] <= metal_grid[0, :, 0]) & (metal_grid[0, :, 0] <= metal_range[1])
+            templates = templates[:, :, w, :]
+            age_grid = age_grid[:, w, :]
+            metal_grid = metal_grid[:, w, :]
+            alpha_grid = alpha_grid[:, w, :]
+            nAges, nMetal, nAlpha = age_grid.shape
 
-        # The code below is the cause of the flux scale issue!!!!!
-        # if norm_range is None:
-        #     flux = np.median(templates[templates > 0])
-        #     templates /= flux  # Normalize by a scalar
-
+        if alpha_range is not None:
+            w = (alpha_range[0] <= alpha_grid[0, 0, :]) & (alpha_grid[0, 0, :] <= alpha_range[1])
+            templates = templates[:, :, :, w]
+            age_grid = age_grid[:, :, w]
+            metal_grid = metal_grid[:, :, w]
+            alpha_grid = alpha_grid[:, :, w]
+            nAges, nMetal, nAlpha = age_grid.shape
 
         self.templates = templates
         self.lam_temp = lam
-        if 'loginterp' in pathname:
-            self.age_grid = 10 ** (age_grid - 9)
-        else:
-            self.age_grid = age_grid
+        self.age_grid = age_grid
         self.metal_grid = metal_grid
-        self.n_ages = n_ages
-        self.n_metal = n_metal
-        self.flux = flux
+        self.alpha_grid = alpha_grid
+        self.n_ages = nAges
+        self.n_metal = nMetal
+        self.n_alpha = nAlpha
         self.FWHM_tem = FWHM_tem

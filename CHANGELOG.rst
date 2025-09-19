@@ -1,3 +1,9 @@
+1.5.0
+=====
+- Re-write scripts: SSPLoader.py; miles_util.py; pegase_interp_util.py; pegase_util.py; xshooter_util.py to make it possible to load multi-alpha templates directly, and reduce Removed many cumbersome procedures
+- Refine configuration parameters, remove some that are only for testing
+
+
 1.4.5
 =====
 - Add function process_DegradingLogRebinning_templates and degrade_logrebin which is for estimating the true answer of GIST results

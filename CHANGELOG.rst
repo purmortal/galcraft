@@ -1,4 +1,4 @@
-1.5.1
+1.5.2
 =====
 
 - Revert back to old version of lsf_MUSE-alphaMC

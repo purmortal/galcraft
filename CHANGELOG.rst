@@ -1,26 +1,33 @@
+1.4.6
+=====
+- Revert some codes to v1.4.2 for SSPLoader.py to fix problems in loading other templates
+
 1.4.5
 =====
+
 - Add function process_DegradingLogRebinning_templates and degrade_logrebin which is for estimating the true answer of GIST results
 
 1.4.4
 =====
+
 - Add lsf_MUSE-alphaMC
 - Change all the class name in SSP templates reader scripts to be "ssp"
 - Refine the script name of each module
 
-
 1.4.3
 =====
-- Limit numpy to be <2.0 and python<=3.12 given the current ebfpy issue
 
+- Limit numpy to be <2.0 and python<=3.12 given the current ebfpy issue
 
 1.4.2
 =====
+
 - Add a version limit for numpy to be <=2.2.6 given numpy.fromstring is removed since then
 - Fix the logging issue for Mac that is not printed in terminal (multiprocessing logging still not printing)
 
 1.4.1
 =====
+
 - Update test kit files due to the change of FWHM strategy in `ssp_loader.py`
 - Fix a problem in `ssp_loader.py`
 
@@ -53,7 +60,6 @@
 - Move SSP loading scripts into the new folder ``ssp_utils``
 - Rename folder ``func`` to be ``modules``
 - Optimize the codes in ``Mainprocess.py``
-
 
 1.1.0
 =====

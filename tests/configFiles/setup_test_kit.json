@@ -8,16 +8,14 @@
   }, 
   "ssp_params":{
     "model": "miles",
-    "isochrone": "BASTI",
-    "imf": "KU",
-    "slope": 1.3,
-    "single_alpha": false,
+    "library": "miles/MILES_BASTI_KU_Ep*/*.fits",
     "factor": 10,
     "FWHM_gal": "lsf_MUSE-WFM-GIST",
     "FWHM_tem": 2.51,
     "dlam": null,
     "age_range": null,
     "metal_range": null,
+    "alpha_range": null,
     "wave_range": [4500, 4700],
     "spec_interpolator": "linear"
   },

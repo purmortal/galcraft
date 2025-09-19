@@ -38,7 +38,7 @@ class model:
         # Define some constants from SSP parameters
         reg_dim = templates.shape[1:]
         wave = model.lam_temp
-        velscale = c * np.log(wave[1]/wave[0])
+        velscale = cvel * np.log(wave[1]/wave[0])
         age_grid = model.age_grid[:, 0, 0]
         metal_grid = model.metal_grid[0, :, 0]
         alpha_grid = model.alpha_grid[0, 0, :]

@@ -78,7 +78,6 @@ class ssp:
             alpha_grid = alpha_grid[:, w, :]
             nAges, nMetal, nAlpha = age_grid.shape
 
-        print(np.unique(alpha_grid))
         if alpha_range is not None:
             w = (alpha_range[0] <= alpha_grid[0, 0, :]) & (alpha_grid[0, 0, :] <= alpha_range[1])
             templates = templates[:, :, :, w]
@@ -87,7 +86,6 @@ class ssp:
             alpha_grid = alpha_grid[:, :, w]
             nAges, nMetal, nAlpha = age_grid.shape
 
-        print(np.unique(alpha_grid))
 
         self.templates = templates
         self.lam_temp = lam

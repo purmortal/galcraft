@@ -3,6 +3,7 @@
 
 - Re-write scripts: SSPLoader.py; miles_util.py; pegase_interp_util.py; pegase_util.py; xshooter_util.py to make it possible to load multi-alpha templates directly, and reduce Removed many cumbersome procedures
 - Refine configuration parameters, remove some that are only for testing
+- Add ``alphaMC_util.py`` to load alphaMC templates, with the corresponding LSF in ``lsf_alphaMC``
 
 1.4.6
 =====

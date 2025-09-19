@@ -1,6 +1,11 @@
 1.5.1
 =====
 
+- Revert back to old version of lsf_MUSE-alphaMC
+
+1.5.1
+=====
+
 - update the lsf_MUSE-alphaMC to set a threshold in case for some wavelength grids it could be problematic
 
 1.5.0

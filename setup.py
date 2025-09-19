@@ -29,14 +29,14 @@ setup(name='GalCraft',
       },
       install_requires=[
           'astropy',
-          'numpy<2.0',
+          'numpy',
           'scipy',
           'matplotlib',
           'ebfpy',
           'ephem',
           'spectres',
       ],
-      python_requires='>=3.6, <3.13',
+      python_requires='>=3.6',
       entry_points={
           'console_scripts': [
               'GalCraft        = GalCraft.MainProcess:main'

@@ -1,3 +1,9 @@
+1.6.0
+=====
+
+- Modified the method to add flux noise, now ['cube_params']['sn'] is the highest flux S/N, other flux noise will be scaled with the same effective exposure time
+
+
 1.5.2
 =====
 

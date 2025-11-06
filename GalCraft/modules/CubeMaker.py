@@ -27,9 +27,11 @@ def write_cube(data_cube, params, x_edges, y_edges, new_wave, filepath, cube_idx
 
     # add noise on it
     if params['cube_params']['add_noise'] == True:
-        logging.info('Adding noise on the flux with sn = %s' % params['cube_params']['sn'])
-        noise = data_cube / params['cube_params']['sn']
-        data_cube_n = np.random.normal(data_cube, noise)
+        logging.info('Adding noise on the flux with maximum sn = %s' % params['cube_params']['sn'])
+        flux_max = np.nanmax(data_cube)
+        exptime = params['cube_params']['sn'] ** 2 / flux_max
+        noise = np.sqrt(data_cube / exptime)
+        data_cube_n = np.random.normal(loc=data_cube, scale=noise)
     else:
         logging.info('No noise was added on the flux')
         data_cube_n = data_cube

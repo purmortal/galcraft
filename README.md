@@ -10,7 +10,8 @@
 
 GalCraft is a flexible software to create mock IFS observations of the Milky Way and other hydrodynamical/N-body simulations. It is entirely written in Python3 and conducts all the procedures from inputting data and spectral templates to the output of IFS data cubes in `fits` format. 
 
-The produced mock data cubes can be analyzed in the same way as real IFS observations by many methods, particularly codes like Voronoi binning ([Cappellari & Copin 2003](https://ui.adsabs.harvard.edu/abs/2003MNRAS.342..345C/abstract)), Penalized Pixel-Fitting (pPXF, [Cappellari & Emsellem 2004](https://ui.adsabs.harvard.edu/abs/2004PASP..116..138C/abstract); [Cappellari 2017](https://ui.adsabs.harvard.edu/abs/2017MNRAS.466..798C/abstract), [2023](https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.3273C/abstract)), line-strength indices (e.g., [Worthey 1994](https://ui.adsabs.harvard.edu/abs/1994ApJS...95..107W/abstract); [Schiavon 2007](https://ui.adsabs.harvard.edu/abs/2007ApJS..171..146S/abstract); [Thomas et al. 2011](https://ui.adsabs.harvard.edu/abs/2011MNRAS.412.2183T/abstract); [Martín-Navarro et al. 2018](https://ui.adsabs.harvard.edu/abs/2018MNRAS.475.3700M/abstract)), or a combination of them (e.g., the GIST pipeline, [Bittner et al. 2019](https://ui.adsabs.harvard.edu/abs/2019A%26A...628A.117B/abstract)).
+The produced mock data cubes can be analyzed in the same way as real IFS observations by many methods, particularly codes like Voronoi binning ([Cappellari & Copin 2003](https://ui.adsabs.harvard.edu/abs/2003MNRAS.342..345C/abstract)), Penalized Pixel-Fitting (pPXF, [Cappellari & Emsellem 2004](https://ui.adsabs.harvard.edu/abs/2004PASP..116..138C/abstract); [Cappellari 2017](https://ui.adsabs.harvard.edu/abs/2017MNRAS.466..798C/abstract), [2023](https://ui.adsabs.harvard.edu/abs/2023MNRAS.526.3273C/abstract)), line-strength indices (e.g., [Worthey 1994](https://ui.adsabs.harvard.edu/abs/1994ApJS...95..107W/abstract); [Schiavon 2007](https://ui.adsabs.harvard.edu/abs/2007ApJS..171..146S/abstract); [Thomas et al. 2011](https://ui.adsabs.harvard.edu/abs/2011MNRAS.412.2183T/abstract); [Martín-Navarro et al. 2018](https://ui.adsabs.harvard.edu/abs/2018MNRAS.475.3700M/abstract)), 
+or a combination of them such as the GIST pipeline ([Bittner et al. 2019](https://ui.adsabs.harvard.edu/abs/2019A%26A...628A.117B/abstract)) and nGIST ([Fraser-McKelvie et al. 2025](https://ui.adsabs.harvard.edu/abs/2025ascl.soft07015F/abstract)).
 
 An elaborate, Python-native parallelization is implemented and tested on various machines from laptops to cluster scales.
 
@@ -56,10 +57,12 @@ A detailed documentation of GalCraft will be available soon.
 
 
 ## Citing GalCraft
-If you use this software framework for any publication, please cite the original paper [Wang et al. (2024)](https://ui.adsabs.harvard.edu/abs/2024MNRAS.534.1175W/abstract), which describes the method and its application to mock Milky Way observations.
+If you use this software framework for any publication, please cite both the original paper [Wang et al. (2024)](https://ui.adsabs.harvard.edu/abs/2024MNRAS.534.1175W/abstract), 
+which describes the method and its application to mock Milky Way observations, 
+and the corresponding [ASCL reference](https://ui.adsabs.harvard.edu/abs/2024ascl.soft10001W/abstract).
 
 ```
-@ARTICLE{2024MNRAS.534.1175W,
+@ARTICLE{Wang2024MNRAS,
        author = {{Wang}, Zixian and {Sharma}, Sanjib and {Hayden}, Michael R. and {van de Sande}, Jesse and {Bland-Hawthorn}, Joss and {Vaughan}, Sam and {Martig}, Marie and {Pinna}, Francesca},
         title = "{Validating full-spectrum fitting with a synthetic integral-field spectroscopic observation of the Milky Way}",
       journal = {\mnras},
@@ -76,9 +79,20 @@ archivePrefix = {arXiv},
        adsurl = {https://ui.adsabs.harvard.edu/abs/2024MNRAS.534.1175W},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+
+@software{Wang2024ascl,
+       author = {{Wang}, Zixian},
+        title = "{GalCraft: Building integral-field spectrograph data cubes of the Milky Way}",
+ howpublished = {Astrophysics Source Code Library, record ascl:2410.001},
+         year = 2024,
+        month = oct,
+          eid = {ascl:2410.001},
+archivePrefix = {ascl},
+       eprint = {2410.001},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2024ascl.soft10001W},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
 ```
-
-
 
 
 ## License

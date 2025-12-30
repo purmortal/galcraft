@@ -176,7 +176,7 @@ def run_GalCraft(CommandOptions):
     # - - - - - - - - - - GENERATE DATACUBE  - - - - - - - - - -
 
         if params['other_params']['mode'] == 'continue' and os.path.exists(filepath + 'data_cube_' + str(cube_idx) + '.fits'):
-            logging.info("Data Cube No.%s exists in %s, will not be run in 'continue' mode" % (cube_idx+1, filepath))
+            logging.info("Data Cube No.%s exists in %s, will run the next cube" % (cube_idx+1, filepath))
             continue
         else:
             logging.info('Start generating the datacube No.%s...' % (cube_idx+1))
@@ -198,6 +198,7 @@ def run_GalCraft(CommandOptions):
     # - - - - - WRITE DATACUBE  - - - - -
 
         CubeMaker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, cube_idx, ssp_model.velscale, __version__)
+        data_cube = None
         logging.info('Data Cube No.%s has been written in %s, total time elapsed: %.2f s' % (cube_idx+1, filepath , clock() - t))
 
 

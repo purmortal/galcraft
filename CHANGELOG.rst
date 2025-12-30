@@ -1,3 +1,11 @@
+1.6.1
+=====
+- Refine label names in ``Binner.py``,  ``utils.py`` for plotting, turn off useOffset for two axes
+- Make logger info clearer in ``MainProcess.py``
+- Refine plotting routine for 'datacube_distrib.png'
+- update ``README.md`` and ``CHANGELOG.rst``
+- Free the memory of data_cube array after saving in fits in ``MainProcess.py``
+
 1.6.0
 =====
 
@@ -7,17 +15,18 @@
 1.5.2
 =====
 
-- Revert back to old version of lsf_MUSE-alphaMC
+- Revert back to old version of ``lsf_MUSE-alphaMC``
 
 1.5.1
 =====
 
-- update the lsf_MUSE-alphaMC to set a threshold in case for some wavelength grids it could be problematic
+- update the ``lsf_MUSE-alphaMC`` to set a threshold in case for some wavelength grids it could be problematic
 
 1.5.0
 =====
 
-- Re-write scripts: SSPLoader.py; miles_util.py; pegase_interp_util.py; pegase_util.py; xshooter_util.py to make it possible to load multi-alpha templates directly, and reduce Removed many cumbersome procedures
+- Re-write scripts: ``SSPLoader.py``; ``miles_util.py``; ``pegase_interp_util.py``; ``pegase_util.py``; ``xshooter_util.py`` to make it possible to load multi-alpha templates directly,
+  and reduce Removed many cumbersome procedures
 - Refine configuration parameters, remove some that are only for testing
 - Add ``alphaMC_util.py`` to load alphaMC templates, with the corresponding LSF in ``lsf_alphaMC``
 - Remove the limitation of numpy and python version
@@ -25,17 +34,17 @@
 1.4.6
 =====
 
-- Revert some codes to v1.4.2 for SSPLoader.py to fix problems in loading other templates
+- Revert some codes to v1.4.2 for ``SSPLoader.py`` to fix problems in loading other templates
 
 1.4.5
 =====
 
-- Add function process_DegradingLogRebinning_templates and degrade_logrebin which is for estimating the true answer of GIST results
+- Add function [process_DegradingLogRebinning_templates] and [degrade_logrebin] which is for estimating the true answer of GIST results
 
 1.4.4
 =====
 
-- Add lsf_MUSE-alphaMC
+- Add ``lsf_MUSE-alphaMC``
 - Change all the class name in SSP templates reader scripts to be "ssp"
 - Refine the script name of each module
 
@@ -53,8 +62,8 @@
 1.4.1
 =====
 
-- Update test kit files due to the change of FWHM strategy in `ssp_loader.py`
-- Fix a problem in `ssp_loader.py`
+- Update test kit files due to the change of FWHM strategy in ``ssp_loader.py``
+- Fix a problem in ``ssp_loader.py``
 
 1.4.0
 =====
@@ -76,7 +85,7 @@
 - Create test kit for github actions
 - Modify ``README.md``
 - Refine ``MainProcess.py``
-- add branch ``test_kit``
+- add branch "test_kit"
 
 1.2.0
 =====

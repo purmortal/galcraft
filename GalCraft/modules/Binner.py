@@ -5,6 +5,7 @@ from astropy.table import Table
 from scipy.stats import binned_statistic_2d
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 
@@ -231,8 +232,17 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
 
 
     logging.info('Plotting the distribution of the datacubes on the Galaxy.')
-    plt.figure(figsize=[6, 2.5])
-    ax = plt.subplot(111)
+    xmin = np.nanmin([np.min([x[0] for x in x_edges_l]), x_edges_plt[0]])
+    xmax = np.nanmax([np.max([x[-1] for x in x_edges_l]), x_edges_plt[-1]])
+    ymin = np.nanmin([np.min([y[0] for y in y_edges_l]), y_edges_plt[0]])
+    ymax = np.nanmax([np.max([y[-1] for y in y_edges_l]), y_edges_plt[-1]])
+    xmin = xmin - (xmax - xmin) * 0.05
+    xmax = xmax + (xmax - xmin) * 0.05
+    ymin = ymin - (ymax - ymin) * 0.05
+    ymax = ymax + (ymax - ymin) * 0.05
+    y_x_ratio = np.abs((ymax - ymin) / (xmax - xmin))
+    fig = plt.figure(figsize=[5, 5/1.3*y_x_ratio])
+    ax = fig.add_subplot(111)
     im, ax, num_counts, xbins, ybins = utils.plot_binned_grids_color(x=d_t[x_coord], y=d_t[y_coord], values=d_t['vr'],
                                                          statistic='count', x_edges=x_edges_plt, y_edges=y_edges_plt,
                                                          xlabel=r"$"+x_coord+"$" + ' (degrees)',
@@ -240,14 +250,19 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
                                                          cblabel='Number Count', color_Lognorm=True, alpha=0.7,
                                                          plot_cb=False)
     plt.gca().set_aspect('equal')
-    ax.set_xlim(x_edges_plt[-1], x_edges_plt[0])
-    cbar = plt.colorbar(im, ax=ax, aspect=15, pad=0.01)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.06)  # size/pad are in axes fraction-ish
+    cbar = fig.colorbar(im, cax=cax)
     cbar.set_label('Number Count', fontsize=8)
     for i in range(len(x_edges_l)):
         ax.add_patch(Rectangle((x_edges_l[i][0], y_edges_l[i][0]), x_edges_l[i][-1] - x_edges_l[i][0],
                                y_edges_l[i][-1] - y_edges_l[i][0],
                                alpha=1, facecolor='none', edgecolor='slateblue', linewidth=1.6))
-    plt.tight_layout(pad=0.03)
+    ax.ticklabel_format(axis='x', style='plain', useOffset=False)
+    ax.ticklabel_format(axis='y', style='plain', useOffset=False)
+    ax.set_xlim(xmax, xmin)
+    ax.set_ylim(ymin, ymax)
+    plt.tight_layout(pad=0.9)
     plt.savefig(filepath + 'datacube_distrib.png', dpi=150)
     logging.info('The figure was successfully saved.')
 

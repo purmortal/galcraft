@@ -2,6 +2,7 @@
 =====
 - Refine label names in `Binner.py`,  'utils.py' for plotting, turn off useOffset for two axes.
 - Make logger info clearer in 'MainProcess.py'
+- Refine plotting routine for 'datacube_distrib.png'
 
 
 1.6.0

@@ -4,6 +4,7 @@
 - Make logger info clearer in ``MainProcess.py``
 - Refine plotting routine for 'datacube_distrib.png'
 - update ``README.md`` and ``CHANGELOG.rst``
+- Free the memory of data_cube array after saving in fits in ``MainProcess.py``
 
 
 1.6.0

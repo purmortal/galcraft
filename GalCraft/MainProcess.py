@@ -198,6 +198,7 @@ def run_GalCraft(CommandOptions):
     # - - - - - WRITE DATACUBE  - - - - -
 
         CubeMaker.write_cube(data_cube, params, x_edges, y_edges, ssp_model.new_wave, filepath, cube_idx, ssp_model.velscale, __version__)
+        data_cube = None
         logging.info('Data Cube No.%s has been written in %s, total time elapsed: %.2f s' % (cube_idx+1, filepath , clock() - t))
 
 

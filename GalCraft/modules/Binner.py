@@ -145,19 +145,19 @@ def spatial_binner(d_t, cube_params, other_params, age_grid, metal_grid, alpha_g
                                                                   statistic='median', x_edges=x_edges_plt, y_edges=y_edges_plt,
                                                                   xlabel=r"$" + x_coord + "$" + ' (degrees)',
                                                                   ylabel=r"$" + y_coord + "$" + ' (degrees)',
-                                                                  cmap=plt.cm.Spectral_r, cblabel='[Alpha/Fe]', color_Lognorm=False)
+                                                                  cmap=plt.cm.Spectral_r, cblabel=r'[$\alpha$/Fe]', color_Lognorm=False)
         plt.subplot(325)
         im, ax, stats_vlos, xbins, ybins = utils.plot_binned_grids_color(x=d_t[x_coord], y=d_t[y_coord], values=d_t['vr'],
                                                                  statistic='median', x_edges=x_edges_plt, y_edges=y_edges_plt,
                                                                  xlabel=r"$" + x_coord + "$" + ' (degrees)',
                                                                  ylabel=r"$" + y_coord + "$" + ' (degrees)',
-                                                                 cmap=plt.cm.Spectral, cblabel='V_los (km/s)', color_Lognorm=False)
+                                                                 cmap=plt.cm.Spectral, cblabel=r'$V_{\rm LOS}$ (km/s)', color_Lognorm=False)
         plt.subplot(326)
         im, ax, stats_vsig, xbins, ybins = utils.plot_binned_grids_color(x=d_t[x_coord], y=d_t[y_coord], values=d_t['vr'],
                                                                  statistic='std', x_edges=x_edges_plt, y_edges=y_edges_plt,
                                                                  xlabel=r"$" + x_coord + "$" + ' (degrees)',
                                                                  ylabel=r"$" + y_coord + "$" + ' (degrees)',
-                                                                 cmap=plt.cm.Spectral_r, cblabel='V_std (km/s)', color_Lognorm=False)
+                                                                 cmap=plt.cm.Spectral_r, cblabel=r'$\sigma_{V_{\rm LOS}}$ (km/s)', color_Lognorm=False)
         plt.tight_layout()
         plt.savefig(filepath + 'particles_distrib.png', dpi=150)
         logging.info('The plot has been finished and saved into the outputs folder.')

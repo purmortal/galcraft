@@ -159,6 +159,8 @@ def plot_binned_grids_color(x, y, values, statistic, x_edges, y_edges, xlabel, y
     if invert_x:
         ax.invert_xaxis()
     # fig.tight_layout()
+    ax.ticklabel_format(axis='x', style='plain', useOffset=False)
+    ax.ticklabel_format(axis='y', style='plain', useOffset=False)
 
     return im, ax, binned_statistic, x_edges, y_edges
 
@@ -213,6 +215,8 @@ def plot_parameter_maps(mass_fraction_pixel_bin, age_grid_2d, metal_grid_2d, alp
     cbar1.set_label('log(Age)')
     ax1.set_ylabel(ylabel)
     ax1.set_xlabel(xlabel)
+    ax1.ticklabel_format(axis='x', style='plain', useOffset=False)
+    ax1.ticklabel_format(axis='y', style='plain', useOffset=False)
 
     plt.subplot(132)
     ax2 = plt.gca()
@@ -223,6 +227,8 @@ def plot_parameter_maps(mass_fraction_pixel_bin, age_grid_2d, metal_grid_2d, alp
     cbar2.set_label('[M/H]')
     ax2.set_ylabel(ylabel)
     ax2.set_xlabel(xlabel)
+    ax2.ticklabel_format(axis='x', style='plain', useOffset=False)
+    ax2.ticklabel_format(axis='y', style='plain', useOffset=False)
 
     plt.subplot(133)
     ax3 = plt.gca()
@@ -230,9 +236,11 @@ def plot_parameter_maps(mass_fraction_pixel_bin, age_grid_2d, metal_grid_2d, alp
     vmax = np.nanpercentile(mass_weighted_alpha, 99.5)
     im3 = ax3.pcolormesh(x_edges, y_edges, mass_weighted_alpha, cmap=cmap, vmin=vmin, vmax=vmax, **kwargs)
     cbar3 = plt.colorbar(im3, ax=ax3)
-    cbar3.set_label('[Alpha/Fe]')
+    cbar3.set_label(r'[$\alpha$/Fe]')
     ax3.set_ylabel(ylabel)
     ax3.set_xlabel(xlabel)
+    ax3.ticklabel_format(axis='x', style='plain', useOffset=False)
+    ax3.ticklabel_format(axis='y', style='plain', useOffset=False)
 
     ax1.invert_xaxis()
     ax2.invert_xaxis()

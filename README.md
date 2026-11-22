@@ -51,7 +51,9 @@ GalCraft --config test_kit --default-dir configFiles/defaultDir
 The data cubes are saved into `./output/test_kit/`
 
 ## Documentation
-A detailed documentation of GalCraft will be available soon.
+Documentation source is available in [`docs/`](docs/index.md). After GitHub Pages is enabled, the public website is expected at [purmortal.github.io/galcraft](https://purmortal.github.io/galcraft/).
+
+The documentation includes a [quick start](docs/getting-started.md), [configuration reference](docs/configuration.md), [input](docs/input-data.md) and [output](docs/outputs.md) guides, [scientific methods](docs/methods.md), and an automatically generated [Python API reference](docs/api.md).
 
 
 

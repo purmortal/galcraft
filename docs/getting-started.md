@@ -1,26 +1,26 @@
 # Getting started
 
-## Install
+## Installation
 
-Install the published package:
+Install the distributed package with pip:
 
 ```bash
 python -m pip install GalCraft
 ```
 
-Or work from a clone:
+Alternatively, install a local checkout (useful while changing the code or documentation):
 
 ```bash
 git clone https://github.com/purmortal/galcraft.git
 cd galcraft
-python -m pip install .
+python -m pip install -e .
 ```
 
-The package declares the dependencies `astropy`, `numpy`, `scipy`, `matplotlib`, `ebfpy`, `ephem` and `spectres`. The installed console command is `GalCraft` (capital G and C).
+GalCraft's package dependencies are `astropy`, `numpy`, `scipy`, `matplotlib`, `ebfpy`, `ephem` and `spectres`. Its executable command is **`GalCraft`** (capital G and C).
 
-## First run: official test kit
+## Run the official example
 
-The example input files live in a *different branch* from the main package source. Download and extract the test kit:
+The test kit is maintained in a separate repository branch and contains its own working directories, configuration and inputs:
 
 ```bash
 curl -L https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip -o test_kit.zip
@@ -29,27 +29,11 @@ cd galcraft-test_kit/tests
 GalCraft --config test_kit --default-dir configFiles/defaultDir
 ```
 
-The test-kit configuration uses a 10 × 10 mock cube, 2-arcsec pixels, an MILES SSP library, and a wavelength range of 4500–4700 Å. It disables added noise and extinction, but enables particle line-of-sight velocities.
-
-The provided example writes to `output/test_kit/`, relative to the test kit's working-directory layout. Expect files such as `data_cube_0.fits`, `mass_fraction_array_0.npy`, diagnostic plots, and `outputs.log`.
+The example configuration requests a 10 × 10 cube with 2-arcsec spatial pixels, MILES SSP templates, and a final 4500–4700 Å wavelength window. It enables stellar line-of-sight velocities but disables simulated noise and extinction.
 
 :::{important}
-`--config test_kit` is a *configuration name*, not a JSON pathname. GalCraft opens `setup_test_kit.json` in the `configDir` configured by `--default-dir`. Non-DEFAULT instrument modes also look for the corresponding `setup_test_kit_list` of cube centres in that directory.
+The value supplied to `--config` is the **configuration name**, not a JSON file path. In this example, the program opens `setup_test_kit.json` inside the configured `configDir` and writes results to `<outputDir>/test_kit/`.
 :::
-
-## Inspect a resulting cube
-
-```python
-from astropy.io import fits
-
-with fits.open("output/test_kit/data_cube_0.fits") as hdul:
-    hdul.info()
-    flux = hdul["DATA"].data  # (wavelength, y, x)
-    wave = hdul["WAVE"].data  # Angstrom
-    print(flux.shape, wave[[0, -1]])
-```
-
-The `ERROR` image extension is only included when `add_noise` is enabled. Read the [outputs](outputs.md) page before interpreting units or auxiliary arrays.
 
 ## Command-line options
 
@@ -57,9 +41,39 @@ The `ERROR` image extension is only included when `add_noise` is enabled. Read t
 GalCraft --config NAME --default-dir PATH
 ```
 
-| Option | Meaning |
+| Argument | Meaning |
 | --- | --- |
-| `--config NAME` | Selects `setup_NAME.json` and the output subdirectory `NAME/`. |
-| `--default-dir PATH` | Text file defining `configDir`, `modelDir`, `templateDir`, and `outputDir`. |
+| `--config NAME` | Base name of `setup_NAME.json`, and name of the output subdirectory. |
+| `--default-dir PATH` | Path to a text file mapping `configDir`, `modelDir`, `templateDir` and `outputDir`. |
 
-GalCraft's current CLI parser does not accept a JSON config filepath directly. Both options should be supplied.
+In the current implementation, the command does not accept a JSON filename as a substitute for `--config NAME`.
+
+## Inspect the generated FITS cube
+
+```python
+from astropy.io import fits
+import numpy as np
+
+with fits.open('output/test_kit/data_cube_0.fits') as hdul:
+    hdul.info()
+    flux = hdul['DATA'].data       # (wavelength, y, x)
+    wave = hdul['WAVE'].data       # Angstrom
+    noise_sigma = hdul['ERROR'].data if 'ERROR' in hdul else None
+
+print('Data shape:', flux.shape)
+print('Wavelength limits:', wave[0], wave[-1])
+print('Median spectrum:', np.nanmedian(flux, axis=(1, 2)).shape)
+```
+
+An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. See [Outputs](outputs.md) for all generated files and their conventions.
+
+## Your own simulation
+
+1. Prepare an EBF particle catalogue with the required physical and coordinate fields.
+2. Obtain SSP spectra compatible with your chosen [SSP reader](configuration.md#ssp-reader-and-input-data).
+3. Create the four-directory mapping file and `setup_NAME.json`.
+4. For `DIY` or an instrument preset, create `setup_NAME_list` containing one `x,y` centre per row.
+5. Run `GalCraft --config NAME --default-dir /path/to/defaultDir`.
+6. Check `outputs.log`, `setup.json`, diagnostic maps and FITS wavelength axes before interpreting fluxes.
+
+The [Workflow](workflow.md) explains every processing stage, and [Configuration](configuration.md) describes the supported keys and assumptions.

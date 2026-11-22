@@ -1,33 +1,32 @@
 # GalCraft
 
-**Build synthetic integral-field spectroscopy (IFS) data cubes from stellar-particle galaxy models.**
+**A Python framework for producing synthetic integral-field spectroscopy (IFS) data cubes from stellar-particle galaxy models.**
 
-GalCraft converts stellar-particle catalogues and simple stellar population (SSP) spectral templates into mock observations, including optional line-of-sight velocities, extinction, instrumental broadening and observational noise. Output FITS cubes can be analysed using the same stellar-kinematic and stellar-population tools employed for observed IFS data.
-
-GalCraft is described in [Wang et al. (2024), MNRAS, 534, 1175](https://doi.org/10.1093/mnras/stae2148). See also the [source code](https://github.com/purmortal/galcraft).
+GalCraft combines the spatial positions, velocities, stellar population parameters and mass weights of simulated stars with simple stellar population (SSP) spectra. It creates mock IFS data products for comparison with observations, with options for line-of-sight Doppler shifts, dust attenuation, instrumental broadening and simplified observational noise.
 
 ```{toctree}
 :maxdepth: 2
-:caption: Start here
+:hidden:
 
 getting-started
 workflow
 configuration
-input-data
 outputs
-```
-
-```{toctree}
-:maxdepth: 2
-:caption: Reference
-
-methods
 api
-limitations
-contributing
-citation
 ```
+
+## Documentation
+
+- **[Getting started](getting-started.md)** — install GalCraft, run the test kit and inspect a cube.
+- **[Workflow](workflow.md)** — follow each processing stage and learn which modules implement it.
+- **[Configuration](configuration.md)** — reference every supported JSON setting, directories and SSP/instrument inputs.
+- **[Outputs](outputs.md)** — understand the FITS cubes, NumPy arrays, tables and diagnostic files.
+- **[Python API](api.md)** — class and function reference generated directly from the source docstrings.
+
+## Scientific reference
+
+GalCraft is described in [Wang et al. (2024), *MNRAS*, 534, 1175](https://doi.org/10.1093/mnras/stae2148). For usage or contributions, see the [GalCraft GitHub repository](https://github.com/purmortal/galcraft).
 
 :::{note}
-This site documents the source provided in the `main` branch archive dated 30 December 2025. The companion [test-kit branch](https://github.com/purmortal/galcraft/tree/test_kit) contains example data and a configuration file. Large model files and SSP libraries are not bundled in the main repository.
+The instructions here reflect the archived GalCraft implementation used to prepare this documentation. The [test-kit branch](https://github.com/purmortal/galcraft/tree/test_kit) contains example inputs and configuration files; SSP libraries and galaxy models are not bundled with the main package.
 :::

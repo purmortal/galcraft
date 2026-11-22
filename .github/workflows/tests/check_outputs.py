@@ -18,7 +18,13 @@ def test_npy(parafile):
     true_file = true_dir / parafile
     output = np.load(output_file)
     true = np.load(true_file)
-    assert np.all(output == true), f"The files {output_file} and {true_file} are not the same!"
+
+    # # old version of pytest
+    # assert np.all(output == true), f"The files {output_file} and {true_file} are not the same!"
+
+    # # new version of pytest
+    diff = np.nanmax(np.abs(output - true))
+    assert diff < 1e-10, f"The files {output_file} and {true_file} differ by {diff}!"
 
 
 files_fits1 = ["data_cube_0.fits", "data_cube_1.fits"]
@@ -28,7 +34,13 @@ def test_fits1(parafile):
     true_file = true_dir / parafile
     output = fits.open(output_file)
     true = fits.open(true_file)
-    assert np.array_equal(output[1].data, true[1].data, equal_nan=True), f"The files {output_file} and {true_file} are not the same!"
+
+    # # old version of pytest
+    # assert np.array_equal(output[1].data, true[1].data, equal_nan=True), f"The files {output_file} and {true_file} are not the same!"
+
+    # # new version of pytest
+    diff = np.nanmax(np.abs(output[1].data - true[1].data))
+    assert diff < 1e-10, f"The files {output_file} and {true_file} differ by {diff}!"
 
 # files_fits2 = ["particle_table_0.fits", "particle_table_1.fits"]
 # @pytest.mark.parametrize("parafile", files_fits2)

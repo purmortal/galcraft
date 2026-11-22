@@ -22,6 +22,7 @@ autodoc_member_order = "bysource"
 autodoc_mock_imports = ["numpy", "scipy", "astropy", "ebf", "ephem", "spectres", "matplotlib"]
 napoleon_numpy_docstring = True
 napoleon_google_docstring = False
+myst_heading_anchors = 3
 html_theme = "pydata_sphinx_theme"
 html_title = "GalCraft Documentation"
 html_theme_options = {"github_url": "https://github.com/purmortal/galcraft", "show_toc_level": 2}

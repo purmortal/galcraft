@@ -70,7 +70,7 @@ An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. See
 ## Your own simulation
 
 1. Prepare an EBF particle catalogue with the required physical and coordinate fields.
-2. Obtain SSP spectra compatible with your chosen [SSP reader](configuration.md#ssp-reader-and-input-data).
+2. Obtain SSP spectra compatible with your chosen [SSP reader](configuration.md).
 3. Create the four-directory mapping file and `setup_NAME.json`.
 4. For `DIY` or an instrument preset, create `setup_NAME_list` containing one `x,y` centre per row.
 5. Run `GalCraft --config NAME --default-dir /path/to/defaultDir`.

@@ -14,9 +14,11 @@ The resulting mock IFS data cubes can be analysed using the same techniques comm
 By bridging stellar-particle simulations and observational IFS data, **GalCraft enables direct, like-for-like comparisons between models of the Milky Way or simulated galaxies and external galaxies observed with IFS instruments**, providing a framework for testing spectral analysis methods and investigating galaxy formation and evolution.
 
 
+
+## Contents
+
 ```{toctree}
 :maxdepth: 2
-:hidden:
 
 getting-started
 workflow
@@ -25,17 +27,12 @@ outputs
 api
 ```
 
-## Documentation
-
-- **[Getting started](getting-started.md)** — install GalCraft, run the test kit and inspect a cube.
-- **[Workflow](workflow.md)** — follow each processing stage and learn which modules implement it.
-- **[Configuration](configuration.md)** — reference every supported JSON setting, directories and SSP/instrument inputs.
-- **[Outputs](outputs.md)** — understand the FITS cubes, NumPy arrays, tables and diagnostic files.
-- **[Python API](api.md)** — class and function reference generated directly from the source docstrings.
 
 ## Scientific reference
-
 GalCraft is described in detail in [Wang et al. (2024), *MNRAS*, 534, 1175](https://doi.org/10.1093/mnras/stae2148). 
 
 ## GitLab Repository
 You can access the source code of GalCraft and its previous releases directly in its official [GitHub repository](https://github.com/purmortal/galcraft). You are also welcome to open issues there.
+
+## Contact 
+- Zixian Wang (wang.zixian.astro@gmail.com)

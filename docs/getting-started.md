@@ -2,51 +2,56 @@
 
 ## Installation
 
-Install the distributed package with pip:
+Install GalCraft with pip:
 
 ```bash
-python -m pip install GalCraft
+pip install GalCraft
 ```
 
-Alternatively, install a local checkout (useful while changing the code or documentation):
+Install from the git repo:
 
 ```bash
 git clone https://github.com/purmortal/galcraft.git
 cd galcraft
-python -m pip install -e .
+pip install .
 ```
 
 GalCraft's package dependencies are `astropy`, `numpy`, `scipy`, `matplotlib`, `ebfpy`, `ephem` and `spectres`. Its executable command is **`GalCraft`** (capital G and C).
 
-## Run the official example
+## Running GalCraft
 
-The test kit is maintained in a separate repository branch and contains its own working directories, configuration and inputs:
+GalCraft is executed from the command line using:
 
 ```bash
-curl -L https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip -o test_kit.zip
-unzip test_kit.zip
-cd galcraft-test_kit/tests
-GalCraft --config test_kit --default-dir configFiles/defaultDir
-```
-
-The example configuration requests a 10 × 10 cube with 2-arcsec spatial pixels, MILES SSP templates, and a final 4500–4700 Å wavelength window. It enables stellar line-of-sight velocities but disables simulated noise and extinction.
-
-:::{important}
-The value supplied to `--config` is the **configuration name**, not a JSON file path. In this example, the program opens `setup_test_kit.json` inside the configured `configDir` and writes results to `<outputDir>/test_kit/`.
-:::
-
-## Command-line options
-
-```text
 GalCraft --config NAME --default-dir PATH
 ```
 
-| Argument | Meaning |
-| --- | --- |
-| `--config NAME` | Base name of `setup_NAME.json`, and name of the output subdirectory. |
-| `--default-dir PATH` | Path to a text file mapping `configDir`, `modelDir`, `templateDir` and `outputDir`. |
+where:
 
-In the current implementation, the command does not accept a JSON filename as a substitute for `--config NAME`.
+| Argument | Description                                                                                                                                                       |
+| --- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--config NAME` | Name of the run. GalCraft loads the corresponding `setup_NAME.json` file from `configDir` and saves the outputs in a subdirectory named `NAME` under `outputDir`. |
+| `--default-dir PATH` | Path to a text file defining the four directories used by GalCraft: `configDir`, `modelDir`, `templateDir`, and `outputDir`.                                      |
+
+**Note:** The `--config` argument accepts the configuration name (`NAME`), rather than the full JSON filename (`setup_NAME.json`) or its file path.
+
+
+## Generate your first data cube
+
+You can generate your first GalCraft data cube using the provided test kit:
+
+```bash
+wget https://github.com/purmortal/galcraft/archive/refs/heads/test_kit.zip
+unzip test_kit.zip
+cd galcraft-test_kit/tests/
+GalCraft --config test_kit --default-dir configFiles/defaultDir
+```
+
+This will generate a 10 × 10 spatial-pixel data cube with a pixel scale of 2 arcsec, using MILES SSP templates over the wavelength range of 4500–4700 Å. 
+The resulting data cube does not include noise or extinction effects. 
+All output files are saved in `<outputDir>/test_kit/`.
+
+
 
 ## Inspect the generated FITS cube
 
@@ -67,13 +72,16 @@ print('Median spectrum:', np.nanmedian(flux, axis=(1, 2)).shape)
 
 An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. See [Outputs](outputs.md) for all generated files and their conventions.
 
-## Your own simulation
+## Generate your own mock data
 
-1. Prepare an EBF particle catalogue with the required physical and coordinate fields.
-2. Obtain SSP spectra compatible with your chosen [SSP reader](configuration.md).
-3. Create the four-directory mapping file and `setup_NAME.json`.
-4. For `DIY` or an instrument preset, create `setup_NAME_list` containing one `x,y` centre per row.
-5. Run `GalCraft --config NAME --default-dir /path/to/defaultDir`.
-6. Check `outputs.log`, `setup.json`, diagnostic maps and FITS wavelength axes before interpreting fluxes.
+To generate custom mock IFS data cubes with GalCraft, follow these steps:
 
-The [Workflow](workflow.md) explains every processing stage, and [Configuration](configuration.md) describes the supported keys and assumptions.
+1. **Prepare the stellar particle catalogue:** Create a FITS file containing the required stellar particle properties (age, metallicity, [α/Fe]), as well as 3D velocities and spatial coordinates.
+2. **Prepare the SSP templates:** Obtain the SSP templates supported by your chosen [SSP reader](configuration.md).
+3. **Set up the directories and configuration:** Create a `defaultDir` file specifying the four working directories, and a `setup_NAME.json` file defining the GalCraft configurations.
+4. **Define the cube pointings:** Create a `setup_NAME_list` file specifying the centre coordinates (`x, y`) of each data cube, with one pointing per row.
+5. **Run GalCraft** using:
+   ```bash
+   GalCraft --config NAME --default-dir /path/to/defaultDir
+   ```
+6. **Inspect the results:** Check the generated FITS data cubes and other output files in the corresponding output directory.

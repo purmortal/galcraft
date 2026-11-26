@@ -70,7 +70,7 @@ print('Wavelength limits:', wave[0], wave[-1])
 print('Median spectrum:', np.nanmedian(flux, axis=(1, 2)).shape)
 ```
 
-An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. See [Outputs](outputs.md) for all generated files and their conventions.
+An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. See [Outputs](input-output.md) for all generated files and their conventions.
 
 ## Generate your own mock data
 

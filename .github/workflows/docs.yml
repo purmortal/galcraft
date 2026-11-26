@@ -18,6 +18,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,13 +48,13 @@ jobs:
           path: docs/_build/html/
 
       - name: Upload GitHub Pages artifact
-        if: github.ref == 'refs/heads/dev-branch'
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/_build/html
 
   deploy:
-    if: github.ref == 'refs/heads/dev-branch'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev-branch'
     needs: build
     runs-on: ubuntu-latest
 

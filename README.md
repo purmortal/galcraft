@@ -51,7 +51,7 @@ GalCraft --config test_kit --default-dir configFiles/defaultDir
 The data cubes are saved into `./output/test_kit/`
 
 ## Documentation
-A detailed documentation of GalCraft will be available soon.
+A detailed documentation of GalCraft is available at [purmortal.github.io/galcraft](https://purmortal.github.io/galcraft/).
 
 
 

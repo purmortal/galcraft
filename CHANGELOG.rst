@@ -1,3 +1,7 @@
+1.7.0
+=====
+- Added GalCraft documentation
+
 1.6.1
 =====
 - Refine label names in ``Binner.py``,  ``utils.py`` for plotting, turn off useOffset for two axes

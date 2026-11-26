@@ -89,10 +89,6 @@ print('Number of wavelengths:', wavelength.size)
 print('Median spectrum:', np.nanmedian(flux, axis=(1, 2)))
 ```
 
-[//]: # (#### Optional noise model)
-
-[//]: # ()
-[//]: # (With `add_noise: true`, the writer calculates a maximum-flux-based normalisation from `sn`, samples Gaussian noise in the flux cube, and stores its **standard deviation** in `ERROR`. This is a simplified simulation, **not** an empirically calibrated instrument noise/variance model. Zero/negative flux may invalidate assumptions of the square-root calculation.)
 
 ### NumPy population and count arrays
 

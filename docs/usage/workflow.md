@@ -4,7 +4,7 @@
 
 *GalCraft flowchart from [Wang et al. (2024)](https://doi.org/10.1093/mnras/stae2148)*
 
-The following stages follow the procedure in [Wang et al. (2024)](https://doi.org/10.1093/mnras/stae2148) and the implementation in the archived GalCraft source. The associated source modules are listed in [Modules](../modules.md).
+The following stages follow the procedure in [Wang et al. (2024)](https://doi.org/10.1093/mnras/stae2148) and the implementation in the current GalCraft source supplied with this repository. The associated source modules are listed in [Modules](../modules.md).
 
 ## 1. Load the stellar particle catalog and configuration
 

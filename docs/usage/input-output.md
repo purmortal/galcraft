@@ -70,7 +70,7 @@ For a run generating multiple pointings, `<i>` denotes the index of each pointin
 **Note**: 
 - `DATA` is recorded with `BUNIT = 10**(-20)*erg/s/cm**2/Angstrom`. 
 - The spatial WCS keywords specify longitude/latitude (either Galactic or equatorial, based on `x_coord` and `y_coord`) and the spectral header uses `AWAV`. 
-- Use `WAVE` as the authoritative spectral axis in case the wavelengths inferred from the `HEADER` is incorrect.
+- Use `WAVE` as the authoritative spectral axis if wavelengths inferred from the header are inconsistent.
 
 ### Read the FITS product
 

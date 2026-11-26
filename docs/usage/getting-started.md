@@ -70,18 +70,19 @@ print('Wavelength limits:', wave[0], wave[-1])
 print('Median spectrum:', np.nanmedian(flux, axis=(1, 2)).shape)
 ```
 
-An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. See [Outputs](input-output.md) for all generated files and their conventions.
+An `ERROR` extension exists **only** when `cube_params.add_noise` is `true`. 
+See [Input & Output](input-output.md#output-files) for all generated files and their conventions.
 
 ## Generate your own mock data
 
 To generate custom mock IFS data cubes with GalCraft, follow these steps:
 
-1. **Prepare the stellar particle catalogue:** Create a FITS file containing the required stellar particle properties (age, metallicity, [α/Fe]), as well as 3D velocities and spatial coordinates.
-2. **Prepare the SSP templates:** Obtain the SSP templates supported by your chosen [SSP reader](configuration.md).
+1. **Prepare the stellar particle catalogue:** Prepare a stellar particle catalogue containing the required stellar population properties, 3D velocities and spatial coordinates. The current command-line reader expects an EBF file; see [Input files](input-output.md#input-files) for details.
+2. **Prepare the SSP templates:** Obtain the SSP templates supported by your chosen [SSP configuration](configuration.md#ssp-spectra-ssp_params).
 3. **Set up the directories and configuration:** Create a `defaultDir` file specifying the four working directories, and a `setup_NAME.json` file defining the GalCraft configurations.
 4. **Define the cube pointings:** Create a `setup_NAME_list` file specifying the centre coordinates (`x, y`) of each data cube, with one pointing per row.
 5. **Run GalCraft** using:
    ```bash
    GalCraft --config NAME --default-dir /path/to/defaultDir
    ```
-6. **Inspect the results:** Check the generated FITS data cubes and other output files in the corresponding output directory.
+6. **Inspect the results:** Check the generated FITS data cubes and other output files in the corresponding output directory.  See [Input & Output](input-output.md#output-files) for the file inventory.

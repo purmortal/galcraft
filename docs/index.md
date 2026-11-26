@@ -3,7 +3,7 @@
 **GalCraft** is a Python framework for generating synthetic integral-field spectroscopy (IFS) data cubes from Galactic chemical evolution (GCE) models and cosmological simulations.
 It can be used to test spectral analysis methods and investigate galaxy formation and evolution by directly comparing the Milky Way and simulated galaxies with external galaxies.
 
-For the scientific motivation and an illustrated summary of how GalCraft works, see the [Overview](overview.md). If you are new to the package, start with [Getting started](others/getting-started.md).
+For the scientific motivation and an illustrated summary of how GalCraft works, see the [Overview](overview.md). If you are new to the package, start with [Getting started](usage/getting-started.md).
 
 ## Contents
 
